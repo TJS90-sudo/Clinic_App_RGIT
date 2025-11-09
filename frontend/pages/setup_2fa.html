@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Setup 2FA</title>
+</head>
+<body>
+    <h1>Two-Factor Authentication Setup</h1>
+
+    <p><b>Your Secret Key:</b> {{ secret }}</p>
+
+    <p>Scan this QR code with your authenticator app:</p>
+    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+
+    <hr>
+
+    <h2>Verify Your Code</h2>
+    <form method="POST" action="/setup_2fa">
+        <label for="code">Enter the 6-digit code from your authenticator:</label><br>
+        <input type="text" id="code" name="code" required>
+        <button type="submit">Verify</button>
+    </form>
+
+</body>
+</html>

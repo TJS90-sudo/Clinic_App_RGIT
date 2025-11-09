@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard - ClinicBook</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../assets/css/staff.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header dashboard-header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-hospital-alt"></i>
+                    <span>ClinicBook</span>
+                </div>
+                <div class="nav-user-info">
+                    <div class="language-selector">
+                        <label for="languageSelect" class="sr-only">Select Language</label>
+                        <select id="languageSelect" title="Select Language" aria-label="Select Language">
+                            <option value="en">English</option>
+                            <option value="zu">isiZulu</option>
+                            <option value="af">Afrikaans</option>
+                        </select>
+                    </div>
+                    <div class="shift-status">
+                        <span class="status-indicator active"></span>
+                        <span data-translate="staff.onDuty">On Duty</span>
+                    </div>
+                    <div class="user-menu">
+                        <span class="user-greeting" data-translate="dashboard.welcome">Welcome</span>
+                        <div class="user-dropdown">
+                            <button type="button" class="user-dropdown-btn">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="userName">Staff Member</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown-menu">
+                                <a href="#" data-translate="dashboard.profile">Profile</a>
+                                <a href="#" data-translate="dashboard.settings">Settings</a>
+                                <a href="#" onclick="logout()" data-translate="dashboard.logout">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item active">
+                        <a href="#dashboard" class="sidebar-link" onclick="showSection('dashboard')">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span data-translate="sidebar.dashboard">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#appointments" class="sidebar-link" onclick="showSection('appointments')">
+                            <i class="fas fa-calendar-check"></i>
+                            <span data-translate="sidebar.appointments">Appointments</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#queue-management" class="sidebar-link" onclick="showSection('queue-management')">
+                            <i class="fas fa-users"></i>
+                            <span data-translate="staff.queueManagement">Queue Management</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#schedule" class="sidebar-link" onclick="showSection('schedule')">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span data-translate="staff.schedule">My Schedule</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#patients" class="sidebar-link" onclick="showSection('patients')">
+                            <i class="fas fa-user-injured"></i>
+                            <span data-translate="staff.patients">Patient Records</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#emergency" class="sidebar-link" onclick="showSection('emergency')">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span data-translate="staff.emergency">Emergency</span>
+                            <span class="emergency-badge" id="emergencyBadge">!</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Overview -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="page-header">
+                    <h1 data-translate="staff.dashboard">Staff Dashboard</h1>
+                    <p data-translate="staff.dashboardSubtitle">Manage appointments and patient care</p>
+                </div>
+
+                <!-- Current Shift Info -->
+                <div class="shift-info-card">
+                    <div class="shift-details">
+                        <h3 data-translate="staff.currentShift">Current Shift</h3>
+                        <p><strong data-translate="staff.shiftTime">Shift Time:</strong> <span id="shiftTime">08:00 - 16:00</span></p>
+                        <p><strong data-translate="staff.room">Room:</strong> <span id="assignedRoom">Room 3A</span></p>
+                        <p><strong data-translate="staff.specialty">Specialty:</strong> <span id="specialty">General Practice</span></p>
+                    </div>
+                    <div class="shift-actions">
+                        <button type="button" class="btn btn-outline" onclick="takeBreak()" data-translate="staff.takeBreak">Take Break</button>
+                        <button type="button" class="btn btn-primary" onclick="callNextPatient()" data-translate="staff.callNext">Call Next Patient</button>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="stats-cards">
+                    <div class="stat-card urgent">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="waitingPatients">8</div>
+                            <div class="stat-label" data-translate="staff.waitingPatients">Patients Waiting</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="todayAppointments">12</div>
+                            <div class="stat-label" data-translate="staff.todayAppointments">Today's Appointments</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="completedToday">4</div>
+                            <div class="stat-label" data-translate="staff.completedToday">Completed Today</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="emergencyCases">2</div>
+                            <div class="stat-label" data-translate="staff.emergencyCases">Emergency Cases</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Queue -->
+                <div class="current-queue-section">
+                    <div class="section-header">
+                        <h2 data-translate="staff.currentQueue">Current Queue</h2>
+                        <button type="button" class="btn btn-outline" onclick="refreshQueue()" data-translate="staff.refresh">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="queue-list" id="currentQueueList">
+                        <!-- Queue items will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Today's Schedule Preview -->
+                <div class="schedule-preview">
+                    <h2 data-translate="staff.todaySchedule">Today's Schedule</h2>
+                    <div class="schedule-timeline" id="scheduleTimeline">
+                        <!-- Timeline items will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appointments Management -->
+            <section id="appointments-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="staff.appointmentManagement">Appointment Management</h1>
+                    <p data-translate="staff.appointmentSubtitle">Manage patient appointments and confirmations</p>
+                </div>
+
+                <div class="appointment-filters">
+                    <div class="filter-group">
+                        <label for="dateFilter" data-translate="appointments.filterDate">Date:</label>
+                        <input type="date" id="dateFilter" onchange="filterStaffAppointments()">
+                    </div>
+                    <div class="filter-group">
+                        <label for="statusFilter" data-translate="appointments.filterStatus">Status:</label>
+                        <select id="statusFilter" onchange="filterStaffAppointments()">
+                            <option value="all" data-translate="appointments.all">All</option>
+                            <option value="confirmed" data-translate="staff.confirmed">Confirmed</option>
+                            <option value="pending" data-translate="staff.pending">Pending Confirmation</option>
+                            <option value="completed" data-translate="appointments.completed">Completed</option>
+                            <option value="cancelled" data-translate="appointments.cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="urgencyFilter" data-translate="staff.urgency">Urgency:</label>
+                        <select id="urgencyFilter" onchange="filterStaffAppointments()">
+                            <option value="all" data-translate="appointments.all">All</option>
+                            <option value="emergency" data-translate="staff.emergency">Emergency</option>
+                            <option value="urgent" data-translate="staff.urgent">Urgent</option>
+                            <option value="routine" data-translate="staff.routine">Routine</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="appointments-table-container">
+                    <table class="appointments-table">
+                        <thead>
+                            <tr>
+                                <th data-translate="appointments.time">Time</th>
+                                <th data-translate="staff.patient">Patient</th>
+                                <th data-translate="staff.contact">Contact</th>
+                                <th data-translate="staff.type">Type</th>
+                                <th data-translate="staff.urgency">Urgency</th>
+                                <th data-translate="appointments.status">Status</th>
+                                <th data-translate="appointments.actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staffAppointmentsTableBody">
+                            <!-- Staff appointments will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Queue Management -->
+            <section id="queue-management-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="staff.queueManagement">Queue Management</h1>
+                    <p data-translate="staff.queueSubtitle">Manage patient queue and waiting times</p>
+                </div>
+
+                <div class="queue-controls">
+                    <div class="queue-actions">
+                        <button type="button" class="btn btn-primary" onclick="callNextPatient()" data-translate="staff.callNext">
+                            <i class="fas fa-arrow-right"></i> Call Next Patient
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="pauseQueue()" data-translate="staff.pauseQueue">
+                            <i class="fas fa-pause"></i> Pause Queue
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="sendBroadcast()" data-translate="staff.broadcast">
+                            <i class="fas fa-bullhorn"></i> Send Broadcast
+                        </button>
+                    </div>
+                </div>
+
+                <div class="queue-overview">
+                    <div class="queue-stats">
+                        <div class="queue-stat">
+                            <div class="stat-value" id="totalWaiting">8</div>
+                            <div class="stat-label" data-translate="staff.totalWaiting">Total Waiting</div>
+                        </div>
+                        <div class="queue-stat">
+                            <div class="stat-value" id="avgWaitTime">15 min</div>
+                            <div class="stat-label" data-translate="staff.avgWaitTime">Avg. Wait Time</div>
+                        </div>
+                        <div class="queue-stat">
+                            <div class="stat-value" id="currentPatient">#5</div>
+                            <div class="stat-label" data-translate="staff.currentPatient">Current Patient</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="queue-management-grid">
+                    <div class="waiting-queue">
+                        <h3 data-translate="staff.waitingQueue">Waiting Queue</h3>
+                        <div class="queue-list vertical" id="waitingQueueList">
+                            <!-- Waiting queue will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="in-progress">
+                        <h3 data-translate="staff.inProgress">In Progress</h3>
+                        <div class="current-patient-card" id="currentPatientCard">
+                            <!-- Current patient info will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Schedule Section -->
+            <section id="schedule-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="staff.mySchedule">My Schedule</h1>
+                    <p data-translate="staff.scheduleSubtitle">View your work schedule and availability</p>
+                </div>
+
+                <div class="schedule-controls">
+                    <div class="schedule-navigation">
+                        <button type="button" class="btn btn-outline" onclick="changeScheduleWeek(-1)">
+                            <i class="fas fa-chevron-left"></i> Previous Week
+                        </button>
+                        <h3 id="currentWeek">October 21 - 27, 2024</h3>
+                        <button type="button" class="btn btn-outline" onclick="changeScheduleWeek(1)">
+                            Next Week <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="schedule-actions">
+                        <button type="button" class="btn btn-outline" onclick="requestTimeOff()" data-translate="staff.requestTimeOff">
+                            <i class="fas fa-calendar-times"></i> Request Time Off
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="swapShift()" data-translate="staff.swapShift">
+                            <i class="fas fa-exchange-alt"></i> Swap Shift
+                        </button>
+                    </div>
+                </div>
+
+                <div class="schedule-grid" id="scheduleGrid">
+                    <!-- Weekly schedule grid will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Patient Records -->
+            <section id="patients-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="staff.patientRecords">Patient Records</h1>
+                    <p data-translate="staff.patientSubtitle">Access patient information and history</p>
+                </div>
+
+                <div class="patient-search">
+                    <div class="search-group">
+                        <input type="text" id="patientSearch" placeholder="Search by name, ID, or phone number" data-translate="staff.searchPlaceholder">
+                        <button type="button" class="btn btn-primary" onclick="searchPatients()">
+                            <i class="fas fa-search"></i> <span data-translate="staff.search">Search</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="patient-results" id="patientResults">
+                    <!-- Patient search results will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Emergency Section -->
+            <section id="emergency-section" class="content-section">
+                <div class="page-header emergency-header">
+                    <h1 data-translate="staff.emergencyManagement">Emergency Management</h1>
+                    <p data-translate="staff.emergencySubtitle">Handle urgent and emergency cases</p>
+                </div>
+
+                <div class="emergency-controls">
+                    <button type="button" class="btn btn-danger" onclick="declareEmergency()" data-translate="staff.declareEmergency">
+                        <i class="fas fa-exclamation-triangle"></i> Declare Emergency
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="callSecurity()" data-translate="staff.callSecurity">
+                        <i class="fas fa-shield-alt"></i> Call Security
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="alertManagement()" data-translate="staff.alertManagement">
+                        <i class="fas fa-bell"></i> Alert Management
+                    </button>
+                </div>
+
+                <div class="emergency-cases">
+                    <h3 data-translate="staff.activeCases">Active Emergency Cases</h3>
+                    <div class="emergency-list" id="emergencyList">
+                        <!-- Emergency cases will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="emergency-protocols">
+                    <h3 data-translate="staff.protocols">Emergency Protocols</h3>
+                    <div class="protocol-list">
+                        <div class="protocol-item">
+                            <h4 data-translate="staff.cardiacEmergency">Cardiac Emergency</h4>
+                            <p data-translate="staff.cardiacProtocol">Call code blue, start CPR if needed, prepare crash cart</p>
+                        </div>
+                        <div class="protocol-item">
+                            <h4 data-translate="staff.traumaCase">Trauma Case</h4>
+                            <p data-translate="staff.traumaProtocol">Assess ABC, immobilize spine, control bleeding</p>
+                        </div>
+                        <div class="protocol-item">
+                            <h4 data-translate="staff.allergicReaction">Severe Allergic Reaction</h4>
+                            <p data-translate="staff.allergyProtocol">Administer epinephrine, monitor airways, call for assistance</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="patientDetailsModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 data-translate="staff.patientDetails">Patient Details</h3>
+                <span class="close" onclick="closeModal('patientDetailsModal')">&times;</span>
+            </div>
+            <div class="modal-body" id="patientDetailsContent">
+                <!-- Patient details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="broadcastModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-translate="staff.sendBroadcast">Send Broadcast Message</h3>
+                <span class="close" onclick="closeModal('broadcastModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="broadcastForm">
+                    <div class="form-group">
+                        <label for="broadcastType" data-translate="staff.messageType">Message Type:</label>
+                        <select id="broadcastType" name="type" required>
+                            <option value="delay" data-translate="staff.delay">Delay Notification</option>
+                            <option value="closure" data-translate="staff.closure">Clinic Closure</option>
+                            <option value="emergency" data-translate="staff.emergency">Emergency Alert</option>
+                            <option value="general" data-translate="staff.general">General Announcement</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="broadcastMessage" data-translate="staff.message">Message:</label>
+                        <textarea id="broadcastMessage" name="message" rows="4" required data-translate="staff.messagePlaceholder" placeholder="Enter your broadcast message"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="sendSMS" name="sendSMS" checked>
+                            <span data-translate="staff.sendSMS">Send via SMS</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="sendEmail" name="sendEmail" checked>
+                            <span data-translate="staff.sendEmail">Send via Email</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" data-translate="staff.sendMessage">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/main.js"></script>
+    <!-- <script src="../assets/js/auth.js"></script> -->
+    <script src="../assets/js/translations.js"></script>
+    <script src="../assets/js/dashboard.js"></script>
+    <script src="../assets/js/staff-dashboard.js"></script>
+</body>
+</html>

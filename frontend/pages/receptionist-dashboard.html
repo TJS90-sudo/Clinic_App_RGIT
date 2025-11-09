@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receptionist Dashboard - ClinicBook</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header dashboard-header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-hospital-alt"></i>
+                    <span>ClinicBook</span>
+                    <span class="admin-badge">RECEPTIONIST</span>
+                </div>
+                <div class="nav-user-info">
+                    <div class="language-selector">
+                        <label for="languageSelect" class="sr-only">Select Language</label>
+                        <select id="languageSelect" title="Select Language" aria-label="Select Language">
+                            <option value="en">English</option>
+                            <option value="zu">isiZulu</option>
+                            <option value="af">Afrikaans</option>
+                        </select>
+                    </div>
+                    <div class="system-status">
+                        <span class="status-indicator active"></span>
+                        <span data-translate="receptionist.systemOnline">System Online</span>
+                    </div>
+                    <div class="user-menu">
+                        <span class="user-greeting" data-translate="dashboard.welcome">Welcome</span>
+                        <div class="user-dropdown">
+                            <button type="button" class="user-dropdown-btn">
+                                <i class="fas fa-user-shield"></i>
+                                <span id="userName">Receptionist</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown-menu">
+                                <a href="#" data-translate="dashboard.profile">Profile</a>
+                                <a href="#" data-translate="receptionist.systemSettings">System Settings</a>
+                                <a href="#" data-translate="receptionist.auditLog">Audit Log</a>
+                                <a href="#" onclick="logout()" data-translate="dashboard.logout">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!-- Dashboard Section -->
+    <section id="dashboard-section" class="content-section active">
+        <div class="container">
+            <div class="stats-grid">
+
+                <div id="todayAppointments">
+                </div>
+
+                <div class="queueLength ">
+                </div>
+
+                <div class="completedTodaym">
+                </div>
+
+                <div class="averageWaitTime">
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+<!-- Queue Section -->
+<section id="queue-section" class="content-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" id="queueTotal">0</div>
+                <div class="stat-label" data-translate="queue.total">Total in Queue</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3</div>
+                <div class="stat-label" data-translate="queue.waiting">Waiting for Doctor</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2</div>
+                <div class="stat-label" data-translate="queue.inProgress">Being Served</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">1</div>
+                <div class="stat-label" data-translate="queue.completed">Completed</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Patients Section -->
+<section id="patients-section" class="content-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">200</div>
+                <div class="stat-label" data-translate="patients.total">Total Patients</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50</div>
+                <div class="stat-label" data-translate="patients.new">New Patients</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">120</div>
+                <div class="stat-label" data-translate="patients.active">Active Patients</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">10</div>
+                <div class="stat-label" data-translate="patients.inactive">Inactive Patients</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Doctors Section -->
+<section id="Doctors-and-nurse-section" class="content-section">
+</section>
+
+<!-- Patient Requests Section -->
+<section id="patientRequests-section" class="content-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">20</div>
+                <div class="stat-label" data-translate="requests.pending">Pending Requests</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">15</div>
+                <div class="stat-label" data-translate="requests.assigned">Assigned to Doctors</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">5</div>
+                <div class="stat-label" data-translate="requests.completed">Completed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2</div>
+                <div class="stat-label" data-translate="requests.urgent">Urgent</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <div class="dashboard-container">
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h2>Receptionist Dashboard</h2>
+            </div>
+
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="sidebar-item active">
+                        <a href="#dashboard-section" class="sidebar-link">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#queue-section" class="sidebar-link">
+                            <i class="fas fa-users"></i> Queue
+                            <span id="queueTotal" class="badge">0</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#patients-section" class="sidebar-link">
+                            <i class="fas fa-user-injured"></i> Patients
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#Doctors-and-nurse-section" class="sidebar-link">
+                            <i class="fas fa-user-md"></i> Doctors
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#patientRequests-section" class="sidebar-link">
+                            <i class="fas fa-notes-medical"></i> Patient Requests
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+
+    <!-- Scripts -->
+
+    <!-- <script src="../assets/js/auth.js"></script> -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/staff-dashboard-copy.js') }}"></script>
+
+</body>
+</html>

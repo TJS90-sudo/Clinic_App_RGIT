@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Clinic Appointment Booking System</title>
+    <link rel="stylesheet" href="static/css/main.css">
+    <link rel="stylesheet" href="static/css/responsive.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-hospital-alt"></i>
+                    <span>ClinicBook</span>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#home" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#services" class="nav-link">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#about" class="nav-link">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#contact" class="nav-link">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="language-selector">
+                            <select id="languageSelect" title="Language Selection">
+                                <option value="en">English</option>
+                                <option value="zu">isiZulu</option>
+                                <option value="af">Afrikaans</option>
+                            </select>
+                        </div>
+                    </li>
+                </ul>
+                <div class="nav-actions">
+                    <button class="btn btn-outline" onclick="openModal('loginModal')">Login</button>
+                    <button class="btn btn-primary" onclick="openModal('registerModal')">Register</button>
+                </div>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title" data-translate="hero.title">
+                    Book Your Clinic Appointment Online
+                </h1>
+                <p class="hero-subtitle" data-translate="hero.subtitle">
+                    Skip the queues, save your time. Book, reschedule, or cancel appointments from anywhere in South Africa.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary btn-large" onclick="openModal('registerModal')" data-translate="hero.bookNow">
+                        Book Appointment Now
+                    </button>
+                    <button class="btn btn-outline btn-large" onclick="scrollToSection('services')" data-translate="hero.learnMore">
+                        Learn More
+                    </button>
+                    <!-- Testing buttons - remove in production -->
+                    <div class="test-buttons">
+                        <button class="btn btn-secondary" onclick="testAdminLogin()">Test Admin Login</button>
+                        <button class="btn btn-secondary" onclick="testStaffLogin()">Test Nurse Login</button>
+                        <button class="btn btn-secondary" onclick="testDoctorLogin()">Test Doctor Login</button>
+                        <button class="btn btn-secondary" onclick="testPatientLogin()">Test Patient Login</button>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <h3 data-translate="hero.quickBook">Quick Booking</h3>
+                    <p data-translate="hero.quickBookDesc">Schedule appointments in under 2 minutes</p>
+                </div>
+                <div class="hero-card">
+                    <i class="fas fa-sms"></i>
+                    <h3 data-translate="hero.smsSupport">SMS Support</h3>
+                    <p data-translate="hero.smsSupportDesc">Works on any phone, smartphone not required</p>
+                </div>
+                <div class="hero-card">
+                    <i class="fas fa-bell"></i>
+                    <h3 data-translate="hero.reminders">Smart Reminders</h3>
+                    <p data-translate="hero.remindersDesc">Never miss an appointment with automated alerts</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-translate="services.title">Our Services</h2>
+                <p data-translate="services.subtitle">Comprehensive healthcare appointment management for all</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3 data-translate="services.patientReg">Patient Registration</h3>
+                    <p data-translate="services.patientRegDesc">Quick and secure registration process with ID verification</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3 data-translate="services.appointment">Appointment Booking</h3>
+                    <p data-translate="services.appointmentDesc">Book, reschedule, or cancel appointments 24/7</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 data-translate="services.queue">Real-time Queue</h3>
+                    <p data-translate="services.queueDesc">Track your position in the queue and estimated wait times</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 data-translate="services.sms">SMS Booking</h3>
+                    <p data-translate="services.smsDesc">Book appointments via SMS for basic phone users</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 data-translate="services.notifications">Smart Notifications</h3>
+                    <p data-translate="services.notificationsDesc">Automated reminders via SMS and email</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 data-translate="services.security">POPIA Compliant</h3>
+                    <p data-translate="services.securityDesc">Your data is secure and protected by law</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label" data-translate="stats.users">Active Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99.5%</div>
+                    <div class="stat-label" data-translate="stats.uptime">System Uptime</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">&lt;2s</div>
+                    <div class="stat-label" data-translate="stats.response">Response Time</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label" data-translate="stats.available">Available</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-hospital-alt"></i>
+                        <span>ClinicBook</span>
+                    </div>
+                    <p data-translate="footer.description">
+                        Streamlining healthcare access across South Africa with digital appointment booking.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.quickLinks">Quick Links</h4>
+                    <ul>
+                        <li><a href="#home" data-translate="footer.home">Home</a></li>
+                        <li><a href="#services" data-translate="footer.services">Services</a></li>
+                        <li><a href="#about" data-translate="footer.about">About</a></li>
+                        <li><a href="#contact" data-translate="footer.contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.support">Support</h4>
+                    <ul>
+                        <li><a href="#" data-translate="footer.help">Help Center</a></li>
+                        <li><a href="#" data-translate="footer.privacy">Privacy Policy</a></li>
+                        <li><a href="#" data-translate="footer.terms">Terms of Service</a></li>
+                        <li><a href="#" data-translate="footer.contact">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.contact">Contact Info</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-phone"></i> +27 123 456 7890</p>
+                        <p><i class="fas fa-envelope"></i> info@clinicbook.co.za</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Cape Town, South Africa</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ClinicBook - Group 25 Bryson. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-translate="login.title">Login to Your Account</h3>
+                <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                    <form id="loginForm" method="POST" action="/auth/login">
+                    <div class="form-group">
+                        <label for="loginEmail" data-translate="login.email">Email Address</label>
+                        <input type="email" id="loginEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword" data-translate="login.password">Password</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: 500; color: var(--text-primary); margin-bottom: 0.5rem; display: block;">Login as:</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="radio" name="role" value="patient" required>
+                                <span>Patient</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="radio" name="role" value="doctor">
+                                <span>Doctor</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="radio" name="role" value="nurse">
+                                <span>Nurse</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="radio" name="role" value="admin">
+                                <span>Admin</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="radio" name="role" value="receptionist">
+                                <span>Receptionist</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="rememberMe">
+                            <span data-translate="login.remember">Remember me</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" data-translate="login.signin">Sign In</button>
+                </form>
+                <div class="modal-footer">
+                    <p><a href="#" data-translate="login.forgot">Forgot your password?</a></p>
+                    <p data-translate="login.noAccount">Don't have an account? <a href="#" onclick="switchModal('loginModal', 'registerModal')" data-translate="login.signup">Sign up here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-translate="register.title">Create Your Account</h3>
+                <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName" data-translate="register.firstName">First Name</label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName" data-translate="register.lastName">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail" data-translate="register.email">Email Address</label>
+                        <input type="email" id="registerEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber" data-translate="register.phone">Phone Number</label>
+                        <input type="tel" id="phoneNumber" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address" data-translate="register.address">Address</label>
+                        <input type="text" id="address" name="address" placeholder="Street address, suburb, city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="idNumber" data-translate="register.idNumber">ID Number</label>
+                        <input type="text" id="idNumber" name="idNumber" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="registerPassword" data-translate="register.password">Password</label>
+                            <input type="password" id="registerPassword" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword" data-translate="register.confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender" data-translate="register.gender">Gender</label>
+                        <select id="gender" name="gender" required>
+
+                            <option value="Male" data-translate="register.gender.male">Male</option>
+                            <option value="Female" data-translate="register.gender.female">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateOfBirth" data-translate="register.dateOfBirth">Date of Birth</label>
+                        <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+                    </div>
+                    <div id="passwordError" style="color: red; display: none;">Passwords do not match.</div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agreeTerms" required>
+                            <span data-translate="register.terms">I agree to the Terms of Service and Privacy Policy</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" data-translate="register.create">Create Account</button>
+                </form>
+                <div class="modal-footer">
+                    <p data-translate="register.hasAccount">Already have an account? <a href="#" onclick="switchModal('registerModal', 'loginModal')" data-translate="register.signin">Sign in here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="static/js/main.js"></script>
+    <!-- <script src="static/js/auth.js"></script> -->
+    <script src="static/js/register.js"></script>
+    <script src="static/js/translations.js"></script>
+</script>
+</body>
+</html>

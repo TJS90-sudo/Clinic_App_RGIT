@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ClinicBook</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header dashboard-header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-hospital-alt"></i>
+                    <span>ClinicBook</span>
+                    <span class="admin-badge">ADMIN</span>
+                </div>
+                <div class="nav-user-info">
+                    <div class="language-selector">
+                        <label for="languageSelect" class="sr-only">Select Language</label>
+                        <select id="languageSelect" title="Select Language" aria-label="Select Language">
+                            <option value="en">English</option>
+                            <option value="zu">isiZulu</option>
+                            <option value="af">Afrikaans</option>
+                        </select>
+                    </div>
+                    <div class="system-status">
+                        <span class="status-indicator active"></span>
+                        <span data-translate="admin.systemOnline">System Online</span>
+                    </div>
+                    <div class="user-menu">
+                        <span class="user-greeting" data-translate="dashboard.welcome">Welcome</span>
+                        <div class="user-dropdown">
+                            <button type="button" class="user-dropdown-btn">
+                                <i class="fas fa-user-shield"></i>
+                                <span id="userName">Administrator</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown-menu">
+                                <a href="#" data-translate="dashboard.profile">Profile</a>
+                                <a href="#" data-translate="admin.systemSettings">System Settings</a>
+                                <a href="#" data-translate="admin.auditLog">Audit Log</a>
+                                <a href="#" onclick="logout()" data-translate="dashboard.logout">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item active">
+                        <a href="#dashboard" class="sidebar-link" onclick="showSection('dashboard')">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span data-translate="sidebar.dashboard">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#users" class="sidebar-link" onclick="showSection('users')">
+                            <i class="fas fa-users"></i>
+                            <span data-translate="admin.userManagement">User Management</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#clinics" class="sidebar-link" onclick="showSection('clinics')">
+                            <i class="fas fa-hospital"></i>
+                            <span data-translate="admin.clinicManagement">Clinic Management</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#staff" class="sidebar-link" onclick="showSection('staff')">
+                            <i class="fas fa-user-md"></i>
+                            <span data-translate="admin.staffManagement">Staff Management</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#appointments" class="sidebar-link" onclick="showSection('appointments')">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span data-translate="admin.appointmentOverview">Appointments</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#reports" class="sidebar-link" onclick="showSection('reports')">
+                            <i class="fas fa-chart-bar"></i>
+                            <span data-translate="admin.reports">Reports & Analytics</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#notifications" class="sidebar-link" onclick="showSection('notifications')">
+                            <i class="fas fa-bell"></i>
+                            <span data-translate="admin.notifications">Notifications</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#settings" class="sidebar-link" onclick="showSection('settings')">
+                            <i class="fas fa-cog"></i>
+                            <span data-translate="admin.systemSettings">System Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Overview -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="page-header">
+                    <h1 data-translate="admin.dashboard">Administrator Dashboard</h1>
+                    <p data-translate="admin.dashboardSubtitle">System overview and management</p>
+                </div>
+
+                <!-- System Health -->
+                <div class="system-health-card">
+                    <div class="health-status">
+                        <div class="health-indicator">
+                            <i class="fas fa-check-circle"></i>
+                            <span data-translate="admin.systemHealthy">System Healthy</span>
+                        </div>
+                        <div class="health-details">
+                            <span data-translate="admin.lastUpdate">Last updated: 2 minutes ago</span>
+                        </div>
+                    </div>
+                    <div class="health-metrics">
+                        <div class="metric">
+                            <span class="metric-value">99.8%</span>
+                            <span class="metric-label" data-translate="admin.uptime">Uptime</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">1.2s</span>
+                            <span class="metric-label" data-translate="admin.responseTime">Avg Response</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">45</span>
+                            <span class="metric-label" data-translate="admin.activeUsers">Active Users</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="totalUsers">1,247</div>
+                            <div class="stat-label" data-translate="admin.totalUsers">Total Users</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +12% this month
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="totalAppointments">8,456</div>
+                            <div class="stat-label" data-translate="admin.totalAppointments">Total Appointments</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +8% this month
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="activeClinics">12</div>
+                            <div class="stat-label" data-translate="admin.activeClinics">Active Clinics</div>
+                            <div class="stat-change neutral">
+                                <i class="fas fa-minus"></i> No change
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="activeStaff">89</div>
+                            <div class="stat-label" data-translate="admin.activeStaff">Active Staff</div>
+                            <div class="stat-change positive">
+                                <i class="fas fa-arrow-up"></i> +3 this week
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Alerts -->
+                <div class="dashboard-grid">
+                    <div class="recent-activity">
+                        <h2 data-translate="admin.recentActivity">Recent Activity</h2>
+                        <div class="activity-list" id="recentActivityList">
+                            <!-- Activity items will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="system-alerts">
+                        <h2 data-translate="admin.systemAlerts">System Alerts</h2>
+                        <div class="alert-list" id="systemAlertsList">
+                            <!-- Alert items will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h2 data-translate="admin.quickActions">Quick Actions</h2>
+                    <div class="action-cards">
+                        <div class="action-card" onclick="showSection('users')">
+                            <i class="fas fa-user-plus"></i>
+                            <h3 data-translate="admin.addUser">Add New User</h3>
+                            <p data-translate="admin.addUserDesc">Register new patients or staff members</p>
+                        </div>
+                        <div class="action-card" onclick="showSection('clinics')">
+                            <i class="fas fa-hospital"></i>
+                            <h3 data-translate="admin.manageClinic">Manage Clinics</h3>
+                            <p data-translate="admin.manageClinicDesc">Configure clinic settings and schedules</p>
+                        </div>
+                        <div class="action-card" onclick="showSection('reports')">
+                            <i class="fas fa-chart-line"></i>
+                            <h3 data-translate="admin.generateReport">Generate Reports</h3>
+                            <p data-translate="admin.generateReportDesc">Create performance and analytics reports</p>
+                        </div>
+                        <div class="action-card" onclick="broadcastMessage()">
+                            <i class="fas fa-bullhorn"></i>
+                            <h3 data-translate="admin.sendBroadcast">Send Broadcast</h3>
+                            <p data-translate="admin.sendBroadcastDesc">Send messages to all users or specific groups</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- User Management -->
+            <section id="users-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="admin.userManagement">User Management</h1>
+                    <p data-translate="admin.userSubtitle">Manage patient and staff accounts</p>
+                </div>
+
+                <div class="section-controls">
+                    <div class="search-filters">
+                        <input type="text" id="userSearch" placeholder="Search users..." data-translate="admin.searchUsers">
+                        <select id="userTypeFilter" title="Filter by user type" aria-label="Filter by user type">
+                            <option value="all" data-translate="admin.allUsers">All Users</option>
+                            <option value="patient" data-translate="admin.patients">Patients</option>
+                            <option value="staff" data-translate="admin.staff">Staff</option>
+                            <option value="admin" data-translate="admin.administrators">Administrators</option>
+                        </select>
+                        <select id="userStatusFilter" title="Filter by user status" aria-label="Filter by user status">
+                            <option value="all" data-translate="admin.allStatuses">All Statuses</option>
+                            <option value="active" data-translate="admin.active">Active</option>
+                            <option value="inactive" data-translate="admin.inactive">Inactive</option>
+                            <option value="suspended" data-translate="admin.suspended">Suspended</option>
+                        </select>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-outline" onclick="exportUsers()" data-translate="admin.exportUsers">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="openModal('addUserModal')" data-translate="admin.addUser">
+                            <i class="fas fa-plus"></i> Add User
+                        </button>
+                    </div>
+                </div>
+
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th data-translate="admin.name">Name</th>
+                                <th data-translate="admin.email">Email</th>
+                                <th data-translate="admin.phone">Phone</th>
+                                <th data-translate="admin.role">Role</th>
+                                <th data-translate="admin.status">Status</th>
+                                <th data-translate="admin.registered">Registered</th>
+                                <th data-translate="admin.actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- User data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Clinic Management -->
+            <section id="clinics-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="admin.clinicManagement">Clinic Management</h1>
+                    <p data-translate="admin.clinicSubtitle">Configure clinics, rooms, and schedules</p>
+                </div>
+
+                <div class="section-controls">
+                    <div class="search-filters">
+                        <input type="text" id="clinicSearch" placeholder="Search clinics..." data-translate="admin.searchClinics">
+                        <select id="clinicStatusFilter" title="Filter by clinic status" aria-label="Filter by clinic status">
+                            <option value="all" data-translate="admin.allStatuses">All Statuses</option>
+                            <option value="active" data-translate="admin.active">Active</option>
+                            <option value="maintenance" data-translate="admin.maintenance">Maintenance</option>
+                            <option value="closed" data-translate="admin.closed">Closed</option>
+                        </select>
+                    </div>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-primary" onclick="openModal('addClinicModal')" data-translate="admin.addClinic">
+                            <i class="fas fa-plus"></i> Add Clinic
+                        </button>
+                    </div>
+                </div>
+
+                <div class="clinics-grid" id="clinicsGrid">
+                    <!-- Clinic cards will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Reports & Analytics -->
+            <section id="reports-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="admin.reports">Reports & Analytics</h1>
+                    <p data-translate="admin.reportsSubtitle">Performance metrics and system analytics</p>
+                </div>
+
+                <div class="reports-controls">
+                    <div class="date-range">
+                        <label for="reportStartDate" data-translate="admin.startDate">Start Date:</label>
+                        <input type="date" id="reportStartDate">
+                        <label for="reportEndDate" data-translate="admin.endDate">End Date:</label>
+                        <input type="date" id="reportEndDate">
+                        <button type="button" class="btn btn-primary" onclick="generateReport()" data-translate="admin.generateReport">Generate Report</button>
+                    </div>
+                </div>
+
+                <div class="reports-grid">
+                    <div class="chart-container">
+                        <h3 data-translate="admin.appointmentTrends">Appointment Trends</h3>
+                        <div class="chart" id="appointmentChart">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3 data-translate="admin.userGrowth">User Growth</h3>
+                        <div class="chart" id="userGrowthChart">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3 data-translate="admin.clinicPerformance">Clinic Performance</h3>
+                        <div class="chart" id="clinicPerformanceChart">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3 data-translate="admin.noShowRates">No-Show Rates</h3>
+                        <div class="chart" id="noShowChart">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-summary">
+                    <h3 data-translate="admin.reportSummary">Report Summary</h3>
+                    <div class="summary-metrics" id="reportSummaryMetrics">
+                        <!-- Summary metrics will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Settings -->
+            <section id="settings-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="admin.systemSettings">System Settings</h1>
+                    <p data-translate="admin.settingsSubtitle">Configure system-wide settings and preferences</p>
+                </div>
+
+                <div class="settings-tabs">
+                    <button type="button" class="tab-button active" onclick="showSettingsTab('general')" data-translate="admin.general">General</button>
+                    <button type="button" class="tab-button" onclick="showSettingsTab('notifications')" data-translate="admin.notifications">Notifications</button>
+                    <button type="button" class="tab-button" onclick="showSettingsTab('security')" data-translate="admin.security">Security</button>
+                    <button type="button" class="tab-button" onclick="showSettingsTab('backup')" data-translate="admin.backup">Backup</button>
+                </div>
+
+                <div class="settings-content">
+                    <div id="general-settings" class="settings-tab active">
+                        <div class="settings-group">
+                            <h3 data-translate="admin.systemConfiguration">System Configuration</h3>
+                            <div class="setting-item">
+                                <label for="systemName" data-translate="admin.systemName">System Name:</label>
+                                <input type="text" id="systemName" value="ClinicBook">
+                            </div>
+                            <div class="setting-item">
+                                <label for="timeZone" data-translate="admin.timeZone">Time Zone:</label>
+                                <select id="timeZone">
+                                    <option value="Africa/Johannesburg">South Africa Standard Time</option>
+                                    <option value="UTC">UTC</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <label for="maxAppointments" data-translate="admin.maxAppointments">Max Appointments per Day:</label>
+                                <input type="number" id="maxAppointments" value="50" min="1" max="200">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="notifications-settings" class="settings-tab">
+                        <div class="settings-group">
+                            <h3 data-translate="admin.notificationSettings">Notification Settings</h3>
+                            <div class="setting-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="enableSMS" checked>
+                                    <span data-translate="admin.enableSMS">Enable SMS Notifications</span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="enableEmail" checked>
+                                    <span data-translate="admin.enableEmail">Enable Email Notifications</span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label for="reminderTime" data-translate="admin.reminderTime">Reminder Time (hours before):</label>
+                                <select id="reminderTime">
+                                    <option value="1">1 hour</option>
+                                    <option value="2">2 hours</option>
+                                    <option value="4">4 hours</option>
+                                    <option value="24" selected>24 hours</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="security-settings" class="settings-tab">
+                        <div class="settings-group">
+                            <h3 data-translate="admin.securitySettings">Security Settings</h3>
+                            <div class="setting-item">
+                                <label for="sessionTimeout" data-translate="admin.sessionTimeout">Session Timeout (minutes):</label>
+                                <input type="number" id="sessionTimeout" value="30" min="5" max="480">
+                            </div>
+                            <div class="setting-item">
+                                <label for="passwordPolicy" data-translate="admin.passwordPolicy">Password Policy:</label>
+                                <select id="passwordPolicy">
+                                    <option value="basic">Basic (8+ characters)</option>
+                                    <option value="medium" selected>Medium (8+ chars, numbers, symbols)</option>
+                                    <option value="strict">Strict (12+ chars, mixed case, numbers, symbols)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="backup-settings" class="settings-tab">
+                        <div class="settings-group">
+                            <h3 data-translate="admin.backupSettings">Backup Settings</h3>
+                            <div class="setting-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="autoBackup" checked>
+                                    <span data-translate="admin.enableAutoBackup">Enable Automatic Backup</span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label for="backupFrequency" data-translate="admin.backupFrequency">Backup Frequency:</label>
+                                <select id="backupFrequency">
+                                    <option value="daily" selected>Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <button type="button" class="btn btn-outline" onclick="performManualBackup()" data-translate="admin.manualBackup">
+                                    <i class="fas fa-download"></i> Manual Backup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-actions">
+                    <button type="button" class="btn btn-outline" onclick="resetSettings()" data-translate="admin.resetSettings">Reset to Defaults</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSettings()" data-translate="admin.saveSettings">Save Settings</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 data-translate="admin.addNewUser">Add New User</h3>
+                <span class="close" onclick="closeModal('addUserModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newUserFirstName" data-translate="admin.firstName">First Name:</label>
+                            <input type="text" id="newUserFirstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserLastName" data-translate="admin.lastName">Last Name:</label>
+                            <input type="text" id="newUserLastName" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newUserEmail" data-translate="admin.email">Email:</label>
+                            <input type="email" id="newUserEmail" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserPhone" data-translate="admin.phone">Phone:</label>
+                            <input type="tel" id="newUserPhone" name="phone" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newUserRole" data-translate="admin.role">Role:</label>
+                            <select id="newUserRole" name="role" required>
+                                <option value="patient" data-translate="admin.patient">Patient</option>
+                                <option value="staff" data-translate="admin.staff">Staff</option>
+                                <option value="admin" data-translate="admin.administrator">Administrator</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserClinic" data-translate="admin.assignedClinic">Assigned Clinic:</label>
+                            <select id="newUserClinic" name="clinic">
+                                <option value="">Select Clinic (Optional)</option>
+                                <!-- Clinic options will be loaded here -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserIdNumber" data-translate="admin.idNumber">ID Number:</label>
+                        <input type="text" id="newUserIdNumber" name="idNumber" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('addUserModal')" data-translate="common.cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary" data-translate="admin.createUser">Create User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/main.js"></script>
+    <!-- <script src="../assets/js/auth.js"></script> -->
+    <script src="../assets/js/translations.js"></script>
+    <script src="../assets/js/dashboard.js"></script>
+    <script src="../assets/js/admin-dashboard.js"></script>
+</body>
+</html>

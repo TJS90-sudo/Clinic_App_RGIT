@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - ClinicBook</title>
+    <link rel="stylesheet" href="../static/css/main.css">
+    <link rel="stylesheet" href="../static/css/responsive.css">
+    <link rel="stylesheet" href="../static/css/dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header dashboard-header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-hospital-alt"></i>
+                    <span>ClinicBook</span>
+                </div>
+                <div class="nav-user-info">
+                    <div class="language-selector">
+                        <label for="languageSelect" class="sr-only">Select Language</label>
+                        <select id="languageSelect" title="Select Language" aria-label="Select Language">
+                            <option value="en">English</option>
+                            <option value="zu">isiZulu</option>
+                            <option value="af">Afrikaans</option>
+                        </select>
+                    </div>
+                    <div class="shift-status">
+                        <span class="status-indicator active"></span>
+                        <span data-translate="doctor.onDuty">On Duty</span>
+                    </div>
+                    <div class="user-menu">
+                        <span class="user-greeting" data-translate="dashboard.welcome">Welcome</span>
+                        <div class="user-dropdown">
+                            <button type="button" class="user-dropdown-btn">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="userName">Doctor</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown-menu">
+                                <a href="#" data-translate="dashboard.profile">Profile</a>
+                                <a href="#" data-translate="dashboard.settings">Settings</a>
+                                <a href="#" onclick="logout()" data-translate="dashboard.logout">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!-- ...existing code... (body content can be modeled after staff-dashboard.html, but replace 'Staff' with 'Doctor' in headings and data-translate attributes where appropriate) ... -->
+    <main class="dashboard-main">
+        <section class="dashboard-header">
+            <h1>Welcome, Doctor</h1>
+            <p>Manage your appointments, view patient details, and more.</p>
+        </section>
+        <section class="dashboard-content">
+            <div class="dashboard-cards">
+                <div class="dashboard-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <h3>Today's Appointments</h3>
+                    <p>View and manage your schedule for today.</p>
+                </div>
+                <div class="dashboard-card">
+                    <i class="fas fa-user-injured"></i>
+                    <h3>Patient List</h3>
+                    <p>Access patient records and medical history.</p>
+                </div>
+                <div class="dashboard-card">
+                    <i class="fas fa-notes-medical"></i>
+                    <h3>Medical Notes</h3>
+                    <p>Write and review patient notes.</p>
+                </div>
+            </div>
+            <div id="appointmentsList" style="margin-top:2rem;"></div>
+            <div id="patientsList" style="margin-top:2rem;"></div>
+        </section>
+    </main>
+    <!-- Scripts -->
+    <script src="../static/js/main.js"></script>
+    <!-- <script src="../static/js/auth.js"></script> -->
+    <script src="../static/js/translations.js"></script>
+    <script src="../static/js/dashboard.js"></script>
+    <script src="../static/js/doctors-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - ClinicBook</title>
+    <link rel="stylesheet" href="../static/css/main.css">
+    <link rel="stylesheet" href="../static/css/responsive.css">
+    <link rel="stylesheet" href="../static/css/dashboard.css">
+    <style>
+    .user-dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        border-radius: 4px;
+        min-width: 160px;
+        z-index: 100;
+    }
+    .user-dropdown-menu.show {
+        display: block;
+    }
+    .user-dropdown-menu a {
+        display: block;
+        padding: 10px 16px;
+        color: #333;
+        text-decoration: none;
+        border-bottom: 1px solid #eee;
+    }
+    .user-dropdown-menu a:last-child {
+        border-bottom: none;
+    }
+    .user-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header dashboard-header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-hospital-alt"></i>
+                    <span>ClinicBook</span>
+                </div>
+                <div class="nav-user-info">
+    <button id="logoutTopBtn" class="btn btn-primary" style="margin-right: 1rem; float: right;" onclick="logoutAndRedirect()">Logout</button>
+                    <div class="language-selector">
+                        <select id="languageSelect" aria-label="Select language" title="Select language">
+                            <option value="en">English</option>
+                            <option value="zu">isiZulu</option>
+                            <option value="af">Afrikaans</option>
+                        </select>
+                    </div>
+                    <div class="user-menu">
+                        <span class="user-greeting" data-translate="dashboard.welcome">Welcome</span>
+                        <div class="user-dropdown">
+                            <button class="user-dropdown-btn" type="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="userName">User</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown-menu">
+                                <a href="#" data-translate="dashboard.profile">Profile</a>
+                                <a href="#" data-translate="dashboard.settings">Settings</a>
+                                <a href="#" onclick="logout()" data-translate="dashboard.logout">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item active">
+                        <a href="#dashboard" class="sidebar-link" onclick="showSection('dashboard')">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#appointments" class="sidebar-link" onclick="showSection('appointments')">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Appointments</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#book-appointment" class="sidebar-link" onclick="showSection('book-appointment')">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Book New</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#queue-status" class="sidebar-link" onclick="showSection('queue-status')">
+                            <i class="fas fa-clock"></i>
+                            <span>Queue Status</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#medical-history" class="sidebar-link" onclick="showSection('medical-history')">
+                            <i class="fas fa-file-medical"></i>
+                            <span>Medical History</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#notifications" class="sidebar-link" onclick="showSection('notifications')">
+                            <i class="fas fa-bell"></i>
+                            <span>Notifications</span>
+                            <span class="notification-badge" id="notificationBadge">3</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Overview -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <p>Welcome to your patient dashboard. Here you can manage your appointments and health information.</p>
+                </div>
+                <!--PATIENT_INFO-->
+            </section>
+
+            <!-- Appointments Section -->
+            <section id="appointments-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="appointments.dashboardTitle">Appointments Dashboard</h1>
+                    <p data-translate="appointments.dashboardDesc">Here you can view, manage, reschedule, or cancel your clinic appointments in real time.</p>
+                </div>
+
+                <div class="appointments-filters">
+                    <div class="filter-group">
+                        <label for="statusFilter" data-translate="appointments.filterStatus">Filter by Status:</label>
+                        <select id="statusFilter" onchange="filterAppointments()">
+                            <option value="all" data-translate="appointments.all">All</option>
+                            <option value="upcoming" data-translate="appointments.upcoming">Upcoming</option>
+                            <option value="completed" data-translate="appointments.completed">Completed</option>
+                            <option value="cancelled" data-translate="appointments.cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="dateFilter" data-translate="appointments.filterDate">Filter by Date:</label>
+                        <input type="date" id="dateFilter" onchange="filterAppointments()">
+                    </div>
+                </div>
+
+                <div class="appointments-table-container">
+                    <table class="appointments-table">
+                        <thead>
+                            <tr>
+                                <th data-translate="appointments.date">Date</th>
+                                <th data-translate="appointments.time">Time</th>
+                                <th data-translate="appointments.doctor">Doctor</th>
+                                <th data-translate="appointments.status">Status</th>
+                                <th data-translate="appointments.actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appointmentsTableBody">
+                            <!-- Appointments will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                <script>
+                async function loadAppointments() {
+                    const res = await fetch('/api/patient/appointments');
+                    const data = await res.json();
+                    const tbody = document.getElementById('appointmentsTableBody');
+                    tbody.innerHTML = '';
+                    if (data.success && data.appointments.length > 0) {
+                        data.appointments.forEach(app => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${app.date}</td>
+                                <td>${app.time}</td>
+                                <td>${app.doctor || ''}</td>
+                                <td>${app.status}</td>
+                                <td>
+                                    <button onclick="cancelAppointment(${app.appointment_id})">Cancel</button>
+                                    <button onclick="showRescheduleModal(${app.appointment_id}, '${app.date}', '${app.time}')">Reschedule</button>
+                                    <button onclick="deleteAppointment(${app.appointment_id})">Delete</button>
+                                </td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    } else {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = '<td colspan="6">No appointments found.</td>';
+                        tr.innerHTML = `<td colspan="6" data-translate="appointments.none">No appointments found.</td>`;
+                        tbody.appendChild(tr);
+                    }
+                }
+                async function cancelAppointment(id) {
+                    if (!confirm('Cancel this appointment?')) return;
+                    const res = await fetch(`/api/patient/appointments/${id}/cancel`, {method: 'POST'});
+                    const data = await res.json();
+                    if (data.success) loadAppointments();
+                    else alert('Failed to cancel appointment.');
+                }
+                async function deleteAppointment(id) {
+                    if (!confirm('Delete this appointment?')) return;
+                    const res = await fetch(`/api/patient/appointments/${id}/delete`, {method: 'POST'});
+                    const data = await res.json();
+                    if (data.success) loadAppointments();
+                    else alert('Failed to delete appointment.');
+                }
+                function showRescheduleModal(id, oldDate, oldTime) {
+                    const newDate = prompt('Enter new date (YYYY-MM-DD):', oldDate);
+                    if (!newDate) return;
+                    const newTime = prompt('Enter new time (HH:MM):', oldTime);
+                    if (!newTime) return;
+                    rescheduleAppointment(id, newDate, newTime);
+                }
+                async function rescheduleAppointment(id, date, time) {
+                    const res = await fetch(`/api/patient/appointments/${id}/reschedule`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({date, time})
+                    });
+                    const data = await res.json();
+                    if (data.success) loadAppointments();
+                    else alert('Failed to reschedule appointment.');
+                }
+                // Load appointments on page load
+                window.addEventListener('DOMContentLoaded', loadAppointments);
+                </script>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Book Appointment Section -->
+            <section id="book-appointment-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="booking.title">Book New Appointment</h1>
+                    <p data-translate="booking.subtitle">Schedule your next clinic visit</p>
+                </div>
+
+                <div class="booking-form-container">
+                    <form id="bookingForm" class="booking-form">
+                        <div class="form-step active" id="step1">
+                            <h3 data-translate="booking.step1">Step 1: Select Clinic & Doctor</h3>
+                            
+                            <!-- Clinic field removed: not in appointments table -->
+
+                            <div class="form-group">
+                                <label for="doctorSelect" data-translate="booking.doctor">Select Doctor</label>
+                                <select id="doctorSelect" name="doctor" required>
+                                    <option value="" data-translate="booking.selectDoctor">Select a doctor</option>
+                                </select>
+                                <script>
+                                document.addEventListener('DOMContentLoaded', async function() {
+                                    const doctorSelect = document.getElementById('doctorSelect');
+                                    if (doctorSelect) {
+                                        try {
+                                            const res = await fetch('/api/employees?role=doctor');
+                                            const data = await res.json();
+                                            if (data.success && Array.isArray(data.doctors) && data.doctors.length > 0) {
+                                                doctorSelect.innerHTML = '<option value="" data-translate="booking.selectDoctor">Select a doctor</option>';
+                                                data.doctors.forEach(function(doc) {
+                                                    doctorSelect.innerHTML += `<option value="${doc.name}">${doc.name} ${doc.specialization ? '(' + doc.specialization + ')' : ''}</option>`;
+                                                });
+                                            } else {
+                                                doctorSelect.innerHTML = '<option value="">No doctors available</option>';
+                                            }
+                                        } catch (e) {
+                                            doctorSelect.innerHTML = '<option value="">Error loading doctors</option>';
+                                        }
+                                    }
+                                });
+                                </script>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="appointmentType" data-translate="booking.type">Appointment Type</label>
+                                <select id="appointmentType" name="type" required>
+                                    <option value="" data-translate="booking.selectType">Select appointment type</option>
+                                    <option value="consultation" data-translate="booking.consultation">General Consultation</option>
+                                    <option value="follow-up" data-translate="booking.followUp">Follow-up</option>
+                                    <option value="emergency" data-translate="booking.emergency">Emergency</option>
+                                </select>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" onclick="nextStep()" data-translate="booking.next">Next Step</button>
+                        </div>
+
+                        <div class="form-step" id="step2">
+                            <h3 data-translate="booking.step2">Step 2: Select Date & Time</h3>
+                            
+                            <div class="date-picker-container">
+                                <div class="calendar-widget" id="calendarWidget">
+                                    <!-- Calendar will be generated here -->
+                                </div>
+                            </div>
+
+                            <div class="time-slots-container">
+                                <h4 data-translate="booking.availableSlots">Available Time Slots</h4>
+                                <div class="time-slots" id="timeSlots">
+                                    <!-- Time slots will be loaded here -->
+                                </div>
+                            </div>
+
+                            <div class="form-navigation">
+                                <button type="button" class="btn btn-outline" onclick="prevStep()" data-translate="booking.back">Back</button>
+                                <button type="button" class="btn btn-primary" onclick="nextStep()" disabled id="step2Next" data-translate="booking.next">Next Step</button>
+                            </div>
+                        </div>
+
+                        <div class="form-step" id="step3">
+                            <h3 data-translate="booking.step3">Step 3: Additional Information</h3>
+                            
+                            <div class="form-group">
+                                <label for="reasonForVisit" data-translate="booking.reason">Reason for Visit</label>
+                                <textarea id="reasonForVisit" name="reason" rows="4" data-translate="booking.reasonPlaceholder" placeholder="Please describe your symptoms or reason for the visit"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="specialRequests" data-translate="booking.specialRequests">Special Requests or Notes</label>
+                                <textarea id="specialRequests" name="requests" rows="3" data-translate="booking.requestsPlaceholder" placeholder="Any special requirements or notes for the doctor"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="smsReminder" name="smsReminder" checked>
+                                    <span data-translate="booking.smsReminder">Send SMS reminder</span>
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="emailReminder" name="emailReminder" checked>
+                                    <span data-translate="booking.emailReminder">Send email reminder</span>
+                                </label>
+                            </div>
+
+                            <div class="form-navigation">
+                                <button type="button" class="btn btn-outline" onclick="prevStep()" data-translate="booking.back">Back</button>
+                                <button type="button" class="btn btn-primary" onclick="reviewBooking()" data-translate="booking.review">Review Booking</button>
+                            </div>
+                        </div>
+
+                        <div class="form-step" id="step4">
+                            <h3 data-translate="booking.step4">Step 4: Review & Confirm</h3>
+                            
+                            <div class="booking-summary" id="bookingSummary">
+                                <!-- Booking summary will be displayed here -->
+                            </div>
+
+                            <div class="form-navigation">
+                                <button type="button" class="btn btn-outline" onclick="prevStep()" data-translate="booking.back">Back</button>
+                                <button type="submit" class="btn btn-primary" data-translate="booking.confirm">Confirm Booking</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Queue Status Section -->
+            <section id="queue-status-section" class="content-section">
+                <div class="page-header">
+                    <h1 data-translate="queue.title">Queue Status</h1>
+                    <p data-translate="queue.subtitle">Track your position and estimated wait time</p>
+                </div>
+
+                <div class="queue-status-container">
+                    <div class="current-queue" id="currentQueue">
+                        <!-- Queue information will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Other sections would be implemented similarly -->
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../static/js/main.js"></script>
+    <!-- <script src="../static/js/auth.js"></script> -->
+    <script src="../static/js/translations.js"></script>
+    <script src="../static/js/dashboard.js"></script>
+    <script>
+    // Ensure Dashboard is initialized on page load
+    if (typeof Dashboard !== 'undefined' && typeof Dashboard.init === 'function') {
+        document.addEventListener('DOMContentLoaded', function() {
+            Dashboard.init();
+        });
+    }
+    </script>
+    <script>
+    // --- Booking Form Submission ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const bookingForm = document.getElementById('bookingForm');
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                // Gather form data
+                const doctor = document.getElementById('doctorSelect').value;
+                const appointmentType = document.getElementById('appointmentType').value;
+                const requestedDate = bookingForm.getAttribute('data-selected-date') || '';
+                const requestedTime = bookingForm.getAttribute('data-selected-time') || '';
+                const reason = document.getElementById('reasonForVisit').value;
+                const specialRequests = document.getElementById('specialRequests').value;
+                const smsReminder = document.getElementById('smsReminder').checked;
+                const emailReminder = document.getElementById('emailReminder').checked;
+                if (!doctor || !appointmentType || !requestedDate || !requestedTime) {
+                    alert('Please complete all required fields and select date/time.');
+                    return;
+                }
+                // Send booking request
+                const res = await fetch('/appointments', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        doctor,
+                        type: appointmentType,
+                        requestedDate, requestedTime,
+                        reason, specialRequests,
+                        smsReminder, emailReminder
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Appointment booked successfully!');
+                    if (typeof loadAppointments === 'function') loadAppointments();
+                    bookingForm.reset();
+                    // Optionally, go back to appointments section
+                    showSection('appointments');
+                } else {
+                    alert('Booking failed: ' + (data.error || 'Unknown error'));
+                }
+            });
+        }
+        // --- Date/Time selection logic (example, adapt as needed) ---
+        // When a date/time is selected in your calendar/time slot UI, set:
+        // bookingForm.setAttribute('data-selected-date', selectedDate);
+        // bookingForm.setAttribute('data-selected-time', selectedTime);
+    });
+    </script>
+    <script>
+    // Dropdown toggle logic (robust)
+    function setupUserDropdown() {
+        const dropdown = document.querySelector('.user-dropdown');
+        const dropdownBtn = document.querySelector('.user-dropdown-btn');
+        const dropdownMenu = document.querySelector('.user-dropdown-menu');
+        if (dropdown && dropdownBtn && dropdownMenu) {
+            // Only toggle on button click
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isOpen = dropdownMenu.classList.toggle('show');
+                dropdown.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+            // Keyboard accessibility for button
+            dropdownBtn.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const isOpen = dropdownMenu.classList.toggle('show');
+                    dropdown.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                } else if (e.key === 'Escape') {
+                    dropdownMenu.classList.remove('show');
+                    dropdown.setAttribute('aria-expanded', 'false');
+                }
+            });
+            // Prevent menu links from bubbling up
+            dropdownMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            // Close on outside click
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target)) {
+                    dropdownMenu.classList.remove('show');
+                    dropdown.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof updateTranslations === 'function') updateTranslations();
+            setupUserDropdown();
+        });
+    } else {
+        if (typeof updateTranslations === 'function') updateTranslations();
+        setupUserDropdown();
+    }
+    // Logout function
+    function logout() {
+        // Optionally, you can call a backend logout endpoint here
+        window.location.href = '/';
+    }
+    </script>
+</body>
+<script>
+// Ensure logout clears session and redirects
+function logoutAndRedirect() {
+    if (typeof logout === 'function') {
+        logout();
+    }
+    setTimeout(function() {
+        window.location.href = '/';
+    }, 300); // let notification show briefly
+}
+</script>
+</html>

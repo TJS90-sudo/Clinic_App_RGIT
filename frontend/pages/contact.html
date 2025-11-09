@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - ClinicBook</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-hospital-alt"></i>
+                    <span>ClinicBook</span>
+                </div>
+                <div class="nav-menu" id="navMenu">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="../index.html" class="nav-link" data-translate="nav.home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#services" class="nav-link" data-translate="nav.services">Services</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="about.html" class="nav-link" data-translate="nav.about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="contact.html" class="nav-link active" data-translate="nav.contact">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="nav-actions">
+                    <div class="language-selector">
+                        <label for="languageSelect" class="sr-only">Select Language</label>
+                        <select id="languageSelect" title="Select Language" aria-label="Select Language">
+                            <option value="en">English</option>
+                            <option value="zu">isiZulu</option>
+                            <option value="af">Afrikaans</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-outline" onclick="openModal('loginModal')" data-translate="nav.login">Login</button>
+                    <button type="button" class="btn btn-primary" onclick="openModal('registerModal')" data-translate="nav.register">Register</button>
+                </div>
+                <button type="button" class="nav-toggle" id="navToggle" title="Toggle navigation menu" aria-label="Toggle navigation menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero contact-hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 data-translate="contact.heroTitle">Get in Touch</h1>
+                <p data-translate="contact.heroSubtitle">We're here to help you with any questions about ClinicBook</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Contact Options -->
+            <section class="contact-section">
+                <div class="section-header">
+                    <h2 data-translate="contact.howCanWeHelp">How Can We Help You?</h2>
+                    <p data-translate="contact.chooseOption">Choose the best way to reach us based on your needs</p>
+                </div>
+                
+                <div class="contact-grid">
+                    <!-- General Inquiries -->
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h3 data-translate="contact.generalInquiries">General Inquiries</h3>
+                        <p data-translate="contact.generalDesc">Questions about our services, features, or how to get started</p>
+                        <div class="contact-details">
+                            <p><i class="fas fa-envelope"></i> info@clinicbook.co.za</p>
+                            <p><i class="fas fa-phone"></i> +27 11 123 4567</p>
+                        </div>
+                        <button type="button" class="btn btn-outline" onclick="openContactModal('general')" data-translate="contact.sendMessage">Send Message</button>
+                    </div>
+
+                    <!-- Technical Support -->
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <h3 data-translate="contact.technicalSupport">Technical Support</h3>
+                        <p data-translate="contact.technicalDesc">Having trouble with the app, website, or booking appointments?</p>
+                        <div class="contact-details">
+                            <p><i class="fas fa-envelope"></i> support@clinicbook.co.za</p>
+                            <p><i class="fas fa-phone"></i> +27 11 123 4568</p>
+                        </div>
+                        <button type="button" class="btn btn-outline" onclick="openContactModal('technical')" data-translate="contact.getSupport">Get Support</button>
+                    </div>
+
+                    <!-- Clinic Partnerships -->
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3 data-translate="contact.clinicPartnerships">Clinic Partnerships</h3>
+                        <p data-translate="contact.clinicDesc">Healthcare providers interested in joining our platform</p>
+                        <div class="contact-details">
+                            <p><i class="fas fa-envelope"></i> partnerships@clinicbook.co.za</p>
+                            <p><i class="fas fa-phone"></i> +27 11 123 4569</p>
+                        </div>
+                        <button type="button" class="btn btn-outline" onclick="openContactModal('partnership')" data-translate="contact.joinNetwork">Join Our Network</button>
+                    </div>
+
+                    <!-- Emergency Support -->
+                    <div class="contact-card emergency">
+                        <div class="contact-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3 data-translate="contact.emergency">Emergency Support</h3>
+                        <p data-translate="contact.emergencyDesc">Urgent technical issues affecting patient care</p>
+                        <div class="contact-details">
+                            <p><i class="fas fa-phone"></i> +27 11 911 0000</p>
+                            <p class="emergency-note" data-translate="contact.emergencyNote">24/7 Emergency Hotline</p>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="window.open('tel:+27119110000')" data-translate="contact.callNow">Call Now</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Form Section -->
+            <section class="contact-section form-section">
+                <div class="section-content">
+                    <div class="form-container">
+                        <h2 data-translate="contact.sendMessage">Send Us a Message</h2>
+                        <p data-translate="contact.formDescription">Fill out the form below and we'll get back to you within 24 hours</p>
+                        
+                        <form id="contactForm" class="contact-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contactFirstName" data-translate="contact.firstName">First Name *</label>
+                                    <input type="text" id="contactFirstName" name="firstName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contactLastName" data-translate="contact.lastName">Last Name *</label>
+                                    <input type="text" id="contactLastName" name="lastName" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contactEmail" data-translate="contact.email">Email Address *</label>
+                                    <input type="email" id="contactEmail" name="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contactPhone" data-translate="contact.phone">Phone Number</label>
+                                    <input type="tel" id="contactPhone" name="phone" placeholder="+27">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="contactSubject" data-translate="contact.subject">Subject *</label>
+                                <select id="contactSubject" name="subject" required title="Select inquiry type" aria-label="Select inquiry type">
+                                    <option value="" data-translate="contact.selectSubject">-- Select Subject --</option>
+                                    <option value="general" data-translate="contact.generalInquiry">General Inquiry</option>
+                                    <option value="technical" data-translate="contact.technicalIssue">Technical Issue</option>
+                                    <option value="partnership" data-translate="contact.partnershipInquiry">Partnership Inquiry</option>
+                                    <option value="feedback" data-translate="contact.feedback">Feedback</option>
+                                    <option value="other" data-translate="contact.other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="contactMessage" data-translate="contact.message">Message *</label>
+                                <textarea id="contactMessage" name="message" rows="6" required placeholder="Please describe your inquiry in detail..."></textarea>
+                            </div>
+                            
+                            <div class="form-group checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="contactConsent" name="consent" required>
+                                    <span data-translate="contact.consent">I consent to ClinicBook storing my information to respond to my inquiry *</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary btn-large" data-translate="contact.sendMessage">Send Message</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="contact-info">
+                        <h3 data-translate="contact.officeHours">Office Hours</h3>
+                        <div class="hours-list">
+                            <div class="hours-item">
+                                <span data-translate="contact.mondayFriday">Monday - Friday:</span>
+                                <span>8:00 AM - 6:00 PM</span>
+                            </div>
+                            <div class="hours-item">
+                                <span data-translate="contact.saturday">Saturday:</span>
+                                <span>9:00 AM - 2:00 PM</span>
+                            </div>
+                            <div class="hours-item">
+                                <span data-translate="contact.sunday">Sunday:</span>
+                                <span data-translate="contact.closed">Closed</span>
+                            </div>
+                        </div>
+                        
+                        <h3 data-translate="contact.visitUs">Visit Our Office</h3>
+                        <div class="address-info">
+                            <p><i class="fas fa-map-marker-alt"></i> 123 Health Street<br>
+                            Cape Town CBD<br>
+                            Cape Town, 8000<br>
+                            South Africa</p>
+                        </div>
+                        
+                        <h3 data-translate="contact.followUs">Follow Us</h3>
+                        <div class="social-links">
+                            <a href="#" aria-label="Facebook" class="social-link">
+                                <i class="fab fa-facebook"></i>
+                                <span>Facebook</span>
+                            </a>
+                            <a href="#" aria-label="Twitter" class="social-link">
+                                <i class="fab fa-twitter"></i>
+                                <span>Twitter</span>
+                            </a>
+                            <a href="#" aria-label="LinkedIn" class="social-link">
+                                <i class="fab fa-linkedin"></i>
+                                <span>LinkedIn</span>
+                            </a>
+                            <a href="#" aria-label="Instagram" class="social-link">
+                                <i class="fab fa-instagram"></i>
+                                <span>Instagram</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ Section -->
+            <section class="contact-section faq-section">
+                <div class="section-header">
+                    <h2 data-translate="contact.faqTitle">Frequently Asked Questions</h2>
+                    <p data-translate="contact.faqSubtitle">Quick answers to common questions</p>
+                </div>
+                
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <button type="button" class="faq-question" onclick="toggleFAQ(this)">
+                            <span data-translate="contact.faq1Question">How do I book an appointment using SMS?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p data-translate="contact.faq1Answer">Simply send an SMS with "BOOK" to our shortcode 32123. You'll receive a reply with further instructions to complete your booking.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button type="button" class="faq-question" onclick="toggleFAQ(this)">
+                            <span data-translate="contact.faq2Question">Is my personal information secure?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p data-translate="contact.faq2Answer">Yes, we use enterprise-grade encryption and follow strict privacy protocols to protect your medical and personal information.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button type="button" class="faq-question" onclick="toggleFAQ(this)">
+                            <span data-translate="contact.faq3Question">Can I cancel or reschedule my appointment?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p data-translate="contact.faq3Answer">Yes, you can cancel or reschedule up to 2 hours before your appointment time through the app, website, or by sending an SMS.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button type="button" class="faq-question" onclick="toggleFAQ(this)">
+                            <span data-translate="contact.faq4Question">What languages are supported?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p data-translate="contact.faq4Answer">ClinicBook is available in English, isiZulu, and Afrikaans. You can switch languages at any time in the app or website.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button type="button" class="faq-question" onclick="toggleFAQ(this)">
+                            <span data-translate="contact.faq5Question">How do I register my clinic with ClinicBook?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p data-translate="contact.faq5Answer">Contact our partnerships team at partnerships@clinicbook.co.za or call +27 11 123 4569 to discuss joining our network.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-hospital-alt"></i>
+                        <span>ClinicBook</span>
+                    </div>
+                    <p data-translate="footer.description">Making healthcare accessible for all South Africans through innovative appointment booking solutions.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.quickLinks">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html" data-translate="nav.home">Home</a></li>
+                        <li><a href="about.html" data-translate="nav.about">About</a></li>
+                        <li><a href="contact.html" data-translate="nav.contact">Contact</a></li>
+                        <li><a href="#" data-translate="footer.privacy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.services">Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" data-translate="services.appointment">Appointment Booking</a></li>
+                        <li><a href="#" data-translate="services.queue">Queue Management</a></li>
+                        <li><a href="#" data-translate="services.sms">SMS Booking</a></li>
+                        <li><a href="#" data-translate="services.reminders">Appointment Reminders</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.contact">Contact Info</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> info@clinicbook.co.za</p>
+                        <p><i class="fas fa-phone"></i> +27 11 123 4567</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Cape Town, South Africa</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ClinicBook. <span data-translate="footer.rights">All rights reserved.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-translate="auth.login">Login</h3>
+                <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginIdentifier" data-translate="auth.phoneOrEmail">Phone Number or Email:</label>
+                        <input type="text" id="loginIdentifier" name="identifier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword" data-translate="auth.password">Password:</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" data-translate="auth.login">Login</button>
+                        <button type="button" class="btn btn-outline" onclick="switchToRegister()" data-translate="auth.noAccount">Don't have an account?</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-translate="auth.register">Register</h3>
+                <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerFirstName" data-translate="auth.firstName">First Name:</label>
+                        <input type="text" id="registerFirstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerLastName" data-translate="auth.lastName">Last Name:</label>
+                        <input type="text" id="registerLastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPhone" data-translate="auth.phone">Phone Number:</label>
+                        <input type="tel" id="registerPhone" name="phone" placeholder="+27" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail" data-translate="auth.email">Email (Optional):</label>
+                        <input type="email" id="registerEmail" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerIdNumber" data-translate="auth.idNumber">ID Number:</label>
+                        <input type="text" id="registerIdNumber" name="idNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword" data-translate="auth.password">Password:</label>
+                        <input type="password" id="registerPassword" name="password" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" data-translate="auth.register">Register</button>
+                        <button type="button" class="btn btn-outline" onclick="switchToLogin()" data-translate="auth.haveAccount">Already have an account?</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/main.js"></script>
+    <!-- <script src="../assets/js/auth.js"></script> -->
+    <script src="../assets/js/translations.js"></script>
+    <script>
+        // FAQ Toggle Function
+        function toggleFAQ(button) {
+            const faqItem = button.parentElement;
+            const answer = faqItem.querySelector('.faq-answer');
+            const icon = button.querySelector('i');
+            
+            faqItem.classList.toggle('active');
+            
+            if (faqItem.classList.contains('active')) {
+                answer.style.maxHeight = answer.scrollHeight + 'px';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                answer.style.maxHeight = '0';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Contact Modal Function (placeholder)
+        function openContactModal(type) {
+            // This would open a specific contact modal based on type
+            console.log('Opening contact modal for:', type);
+            // For now, just scroll to the contact form
+            document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+            
+            // Pre-select the subject based on type
+            const subjectSelect = document.getElementById('contactSubject');
+            if (subjectSelect) {
+                subjectSelect.value = type === 'partnership' ? 'partnership' : 
+                                   type === 'technical' ? 'technical' : 'general';
+            }
+        }
+
+        // Contact Form Submission
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show success message (placeholder)
+            alert('Thank you for your message! We\'ll get back to you within 24 hours.');
+            
+            // Reset form
+            this.reset();
+        });
+    </script>
+</body>
+</html>

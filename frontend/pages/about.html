@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - ClinicBook</title>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/responsive.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-hospital-alt"></i>
+                    <span>ClinicBook</span>
+                </div>
+                <div class="nav-menu" id="navMenu">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="../index.html" class="nav-link" data-translate="nav.home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#services" class="nav-link" data-translate="nav.services">Services</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="about.html" class="nav-link active" data-translate="nav.about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="contact.html" class="nav-link" data-translate="nav.contact">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="nav-actions">
+                    <div class="language-selector">
+                        <label for="languageSelect" class="sr-only">Select Language</label>
+                        <select id="languageSelect" title="Select Language" aria-label="Select Language">
+                            <option value="en">English</option>
+                            <option value="zu">isiZulu</option>
+                            <option value="af">Afrikaans</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-outline" onclick="openModal('loginModal')" data-translate="nav.login">Login</button>
+                    <button type="button" class="btn btn-primary" onclick="openModal('registerModal')" data-translate="nav.register">Register</button>
+                </div>
+                <button type="button" class="nav-toggle" id="navToggle" title="Toggle navigation menu" aria-label="Toggle navigation menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero about-hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 data-translate="about.heroTitle">About ClinicBook</h1>
+                <p data-translate="about.heroSubtitle">Revolutionizing healthcare access through innovative appointment booking technology</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Mission Section -->
+            <section class="about-section">
+                <div class="section-content">
+                    <div class="text-content">
+                        <h2 data-translate="about.missionTitle">Our Mission</h2>
+                        <p data-translate="about.missionText">ClinicBook is dedicated to making healthcare more accessible for everyone in South Africa. We believe that booking a medical appointment should be simple, efficient, and available to all, regardless of their technological literacy or device capabilities.</p>
+                        <p data-translate="about.missionDetails">Our platform bridges the digital divide by offering multiple booking channels - from smartphone apps to simple SMS - ensuring that every South African can access quality healthcare when they need it most.</p>
+                    </div>
+                    <div class="image-content">
+                        <div class="placeholder-image">
+                            <i class="fas fa-heart"></i>
+                            <p>Healthcare for All</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="about-section features-section">
+                <div class="section-header">
+                    <h2 data-translate="about.featuresTitle">What Makes Us Different</h2>
+                    <p data-translate="about.featuresSubtitle">Innovative solutions designed for South African healthcare needs</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 data-translate="about.multiChannelTitle">Multi-Channel Access</h3>
+                        <p data-translate="about.multiChannelDesc">Book appointments via smartphone app, SMS, or web browser - whatever works best for you.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <h3 data-translate="about.multiLanguageTitle">Multi-Language Support</h3>
+                        <p data-translate="about.multiLanguageDesc">Available in English, isiZulu, and Afrikaans to serve all South Africans in their preferred language.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3 data-translate="about.realTimeTitle">Real-Time Updates</h3>
+                        <p data-translate="about.realTimeDesc">Live queue management and appointment status updates keep you informed every step of the way.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 data-translate="about.secureTitle">Secure & Private</h3>
+                        <p data-translate="about.secureDesc">Your medical information is protected with enterprise-grade security and privacy measures.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 data-translate="about.inclusiveTitle">Inclusive Design</h3>
+                        <p data-translate="about.inclusiveDesc">Designed for users of all ages and technical abilities, with accessibility at the forefront.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 data-translate="about.analyticsTitle">Smart Analytics</h3>
+                        <p data-translate="about.analyticsDesc">Data-driven insights help clinics optimize their operations and improve patient care.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Impact Section -->
+            <section class="about-section impact-section">
+                <div class="section-content reverse">
+                    <div class="image-content">
+                        <div class="placeholder-image">
+                            <i class="fas fa-chart-bar"></i>
+                            <p>Making an Impact</p>
+                        </div>
+                    </div>
+                    <div class="text-content">
+                        <h2 data-translate="about.impactTitle">Our Impact</h2>
+                        <div class="impact-stats">
+                            <div class="stat">
+                                <div class="stat-number">50,000+</div>
+                                <div class="stat-label" data-translate="about.appointmentsBooked">Appointments Booked</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">200+</div>
+                                <div class="stat-label" data-translate="about.clinicsServed">Clinics Served</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">85%</div>
+                                <div class="stat-label" data-translate="about.waitTimeReduction">Wait Time Reduction</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">98%</div>
+                                <div class="stat-label" data-translate="about.patientSatisfaction">Patient Satisfaction</div>
+                            </div>
+                        </div>
+                        <p data-translate="about.impactText">Since our launch, ClinicBook has transformed how South Africans access healthcare. We've reduced waiting times, improved appointment attendance rates, and made healthcare more accessible to underserved communities.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Team Section -->
+            <section class="about-section team-section">
+                <div class="section-header">
+                    <h2 data-translate="about.teamTitle">Our Team</h2>
+                    <p data-translate="about.teamSubtitle">Passionate professionals committed to improving healthcare access</p>
+                </div>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="member-photo">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Dr. Sarah Johnson</h3>
+                        <p class="member-role" data-translate="about.ceoRole">CEO & Co-Founder</p>
+                        <p class="member-bio" data-translate="about.ceoBio">Former public health physician with 15 years of experience in South African healthcare systems.</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-photo">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Michael Chen</h3>
+                        <p class="member-role" data-translate="about.ctoRole">CTO & Co-Founder</p>
+                        <p class="member-bio" data-translate="about.ctoBio">Technology leader specializing in scalable healthcare solutions and mobile-first design.</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-photo">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Nomsa Mthembu</h3>
+                        <p class="member-role" data-translate="about.headProductRole">Head of Product</p>
+                        <p class="member-bio" data-translate="about.headProductBio">UX specialist focused on creating inclusive digital experiences for diverse user groups.</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-photo">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Dr. James van der Merwe</h3>
+                        <p class="member-role" data-translate="about.medicalAdvisorRole">Chief Medical Advisor</p>
+                        <p class="member-bio" data-translate="about.medicalAdvisorBio">General practitioner and healthcare innovation expert with deep understanding of clinical workflows.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Values Section -->
+            <section class="about-section values-section">
+                <div class="section-header">
+                    <h2 data-translate="about.valuesTitle">Our Values</h2>
+                </div>
+                <div class="values-grid">
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3 data-translate="about.accessibilityTitle">Accessibility First</h3>
+                        <p data-translate="about.accessibilityDesc">Healthcare should be accessible to everyone, regardless of their background or technical skills.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 data-translate="about.inclusivityTitle">Inclusivity</h3>
+                        <p data-translate="about.inclusivityDesc">We celebrate South Africa's diversity and ensure our platform serves all communities equally.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h3 data-translate="about.innovationTitle">Innovation</h3>
+                        <p data-translate="about.innovationDesc">We continuously innovate to solve real healthcare challenges with practical, user-friendly solutions.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3 data-translate="about.partnershipsTitle">Strong Partnerships</h3>
+                        <p data-translate="about.partnershipsDesc">We work closely with healthcare providers to understand and address their unique challenges.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="about-section cta-section">
+                <div class="cta-content">
+                    <h2 data-translate="about.ctaTitle">Ready to Transform Your Healthcare Experience?</h2>
+                    <p data-translate="about.ctaSubtitle">Join thousands of South Africans who have already simplified their healthcare appointments</p>
+                    <div class="cta-actions">
+                        <button type="button" class="btn btn-primary btn-large" onclick="openModal('registerModal')" data-translate="about.getStarted">Get Started Today</button>
+                        <a href="contact.html" class="btn btn-outline btn-large" data-translate="about.learnMore">Learn More</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-hospital-alt"></i>
+                        <span>ClinicBook</span>
+                    </div>
+                    <p data-translate="footer.description">Making healthcare accessible for all South Africans through innovative appointment booking solutions.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.quickLinks">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html" data-translate="nav.home">Home</a></li>
+                        <li><a href="about.html" data-translate="nav.about">About</a></li>
+                        <li><a href="contact.html" data-translate="nav.contact">Contact</a></li>
+                        <li><a href="#" data-translate="footer.privacy">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.services">Services</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" data-translate="services.appointment">Appointment Booking</a></li>
+                        <li><a href="#" data-translate="services.queue">Queue Management</a></li>
+                        <li><a href="#" data-translate="services.sms">SMS Booking</a></li>
+                        <li><a href="#" data-translate="services.reminders">Appointment Reminders</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.contact">Contact Info</h4>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> info@clinicbook.co.za</p>
+                        <p><i class="fas fa-phone"></i> +27 11 123 4567</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Cape Town, South Africa</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ClinicBook. <span data-translate="footer.rights">All rights reserved.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-translate="auth.login">Login</h3>
+                <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginIdentifier" data-translate="auth.phoneOrEmail">Phone Number or Email:</label>
+                        <input type="text" id="loginIdentifier" name="identifier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword" data-translate="auth.password">Password:</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" data-translate="auth.login">Login</button>
+                        <button type="button" class="btn btn-outline" onclick="switchToRegister()" data-translate="auth.noAccount">Don't have an account?</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-translate="auth.register">Register</h3>
+                <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerFirstName" data-translate="auth.firstName">First Name:</label>
+                        <input type="text" id="registerFirstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerLastName" data-translate="auth.lastName">Last Name:</label>
+                        <input type="text" id="registerLastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPhone" data-translate="auth.phone">Phone Number:</label>
+                        <input type="tel" id="registerPhone" name="phone" placeholder="+27" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail" data-translate="auth.email">Email (Optional):</label>
+                        <input type="email" id="registerEmail" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerIdNumber" data-translate="auth.idNumber">ID Number:</label>
+                        <input type="text" id="registerIdNumber" name="idNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword" data-translate="auth.password">Password:</label>
+                        <input type="password" id="registerPassword" name="password" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" data-translate="auth.register">Register</button>
+                        <button type="button" class="btn btn-outline" onclick="switchToLogin()" data-translate="auth.haveAccount">Already have an account?</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/main.js"></script>
+    <!-- <script src="../assets/js/auth.js"></script> -->
+    <script src="../assets/js/translations.js"></script>
+</body>
+</html>
