@@ -108,102 +108,252 @@ class Appointment:
 
 class Schedule_System: 
     def get_appointments_by_email(self, email):
+        """Fetch appointments for the patient identified by email using the Appointments schema.
+
+        Returns a list of dicts with keys: appointment_id, date, time, doctor, clinic, status.
+        Clinic is not part of the schema, so it's returned as an empty string.
+        """
         try:
             conn = self.getConnection()
             cursor = conn.cursor()
+
             # Get patient id from email
-            cursor.execute("SELECT idnumber FROM patient WHERE email = %s", (email,))
+            cursor.execute("SELECT PatientID FROM Patient WHERE Email = %s", (email,))
             row = cursor.fetchone()
             if not row:
-                cursor.close()
-                conn.close()
                 return []
             patient_id = row[0]
-            # Get appointments for this patient
-            cursor.execute("SELECT appointment_id, requesteddate, requestedtime, doctor, clinic, status FROM appointment WHERE patientid = %s", (patient_id,))
-            appointments = [
-                {
-                    'appointment_id': r[0],
-                    'date': r[1],
-                    'time': r[2],
-                    'doctor': r[3],
-                    'clinic': r[4],
-                    'status': r[5],
-                } for r in cursor.fetchall()
-            ]
-            cursor.close()
-            conn.close()
+
+            # Get appointments for this patient, join doctor name if available
+            cursor.execute(
+                """
+                SELECT a.AppointmentID,
+                       a.Date,
+                       a.Time,
+                       a.Status,
+                       e.Name AS DoctorName,
+                       a.RoomID
+                FROM Appointments a
+                LEFT JOIN Employee e ON a.EmployeeID = e.EmployeeID
+                WHERE a.PatientID = %s
+                ORDER BY a.Date ASC, a.Time ASC
+                """,
+                (patient_id,)
+            )
+
+            appointments = []
+            for r in cursor.fetchall():
+                appt_id, appt_date, appt_time, status, doctor_name, room_id = r
+                # Format date and time to strings
+                if isinstance(appt_date, (datetime, date)):
+                    date_str = appt_date.strftime('%Y-%m-%d') if isinstance(appt_date, (datetime, date)) else str(appt_date)
+                else:
+                    date_str = str(appt_date)
+                if isinstance(appt_time, (datetime, time)):
+                    time_str = appt_time.strftime('%H:%M')
+                else:
+                    # might already be text
+                    time_str = str(appt_time)[:5]
+
+                appointments.append({
+                    'appointment_id': appt_id,
+                    'date': date_str,
+                    'time': time_str,
+                    'doctor': doctor_name or '',
+                    'clinic': '',
+                    'status': status
+                })
+
             return appointments
         except Exception as e:
-            cursor.close()
-            conn.close()
+            print(f"Exception fetching appointments: {e}")
             return []
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
 
     def cancel_appointment(self, appointment_id, patient_email):
         try:
             conn = self.getConnection()
             cursor = conn.cursor()
             # Check appointment belongs to patient
-            cursor.execute("SELECT a.appointment_id FROM appointment a JOIN patient p ON a.patientid = p.idnumber WHERE a.appointment_id = %s AND p.email = %s", (appointment_id, patient_email))
+            cursor.execute(
+                """
+                SELECT a.AppointmentID
+                FROM Appointments a
+                JOIN Patient p ON a.PatientID = p.PatientID
+                WHERE a.AppointmentID = %s AND p.Email = %s
+                """,
+                (appointment_id, patient_email)
+            )
             if not cursor.fetchone():
-                cursor.close()
-                conn.close()
                 return False
-            cursor.execute("UPDATE appointment SET status = 'cancelled' WHERE appointment_id = %s", (appointment_id,))
+            cursor.execute("UPDATE Appointments SET Status = 'cancelled' WHERE AppointmentID = %s", (appointment_id,))
             conn.commit()
-            cursor.close()
-            conn.close()
             return True
         except Exception as e:
-            cursor.close()
-            conn.close()
+            print(f"Exception cancelling appointment: {e}")
             return False
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
 
     def delete_appointment(self, appointment_id, patient_email):
         try:
             conn = self.getConnection()
             cursor = conn.cursor()
-            cursor.execute("SELECT a.appointment_id FROM appointment a JOIN patient p ON a.patientid = p.idnumber WHERE a.appointment_id = %s AND p.email = %s", (appointment_id, patient_email))
+            cursor.execute(
+                """
+                SELECT a.AppointmentID
+                FROM Appointments a
+                JOIN Patient p ON a.PatientID = p.PatientID
+                WHERE a.AppointmentID = %s AND p.Email = %s
+                """,
+                (appointment_id, patient_email)
+            )
             if not cursor.fetchone():
-                cursor.close()
-                conn.close()
                 return False
-            cursor.execute("DELETE FROM appointment WHERE appointment_id = %s", (appointment_id,))
+            cursor.execute("DELETE FROM Appointments WHERE AppointmentID = %s", (appointment_id,))
             conn.commit()
-            cursor.close()
-            conn.close()
             return True
         except Exception as e:
-            cursor.close()
-            conn.close()
+            print(f"Exception deleting appointment: {e}")
             return False
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
 
     def reschedule_appointment(self, appointment_id, patient_email, new_date, new_time):
         try:
             conn = self.getConnection()
             cursor = conn.cursor()
-            cursor.execute("SELECT a.appointment_id FROM appointment a JOIN patient p ON a.patientid = p.idnumber WHERE a.appointment_id = %s AND p.email = %s", (appointment_id, patient_email))
+            cursor.execute(
+                """
+                SELECT a.AppointmentID
+                FROM Appointments a
+                JOIN Patient p ON a.PatientID = p.PatientID
+                WHERE a.AppointmentID = %s AND p.Email = %s
+                """,
+                (appointment_id, patient_email)
+            )
             if not cursor.fetchone():
-                cursor.close()
-                conn.close()
                 return False
-            cursor.execute("UPDATE appointment SET requesteddate = %s, requestedtime = %s, status = 'upcoming' WHERE appointment_id = %s", (new_date, new_time, appointment_id))
+            cursor.execute(
+                """
+                UPDATE Appointments
+                SET Date = %s, Time = %s, Status = 'pending'
+                WHERE AppointmentID = %s
+                """,
+                (new_date, new_time, appointment_id)
+            )
             conn.commit()
-            cursor.close()
-            conn.close()
             return True
         except Exception as e:
+            print(f"Exception rescheduling appointment: {e}")
+            return False
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
+    def get_patient_by_email(self, email):
+        try:
+            conn = self.getConnection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT email, contactnumber, address, dateofbirth, idnumber, gender, name FROM patient WHERE email = %s", (email,))
+            row = cursor.fetchone()
             cursor.close()
             conn.close()
-            return False
-   
-
-    def getConnection(self):
-        try:
-            conn = psycopg2.connect(DB_URL)
-            return conn
+            if row:
+                return {
+                    'email': row[0],
+                    'contact_number': row[1],
+                    'address': row[2],
+                    'date_of_birth': row[3],
+                    'id_number': row[4],
+                    'gender': row[5],
+                    'name': row[6],
+                }
+            else:
+                return None
         except Exception as e:
+            print(f"Exception fetching patient by email: {e}")
             return None
+
+    def upsert_patient_profile(self, email: str, fields: dict):
+        """Create or update a patient's profile by email.
+
+        Allowed fields: name, contact_number, address, date_of_birth, gender, id_number
+        Returns True on success, False otherwise.
+        """
+        allowed = {
+            'name': 'name',
+            'contact_number': 'contactnumber',
+            'address': 'address',
+            'date_of_birth': 'dateofbirth',
+            'gender': 'gender',
+            'id_number': 'idnumber',
+        }
+        try:
+            conn = self.getConnection()
+            cursor = conn.cursor()
+
+            # Check if patient record exists
+            cursor.execute("SELECT 1 FROM patient WHERE email = %s", (email,))
+            exists = cursor.fetchone() is not None
+
+            # Build data mapping using only provided allowed fields
+            data = {}
+            for k, v in (fields or {}).items():
+                if k in allowed:
+                    data[allowed[k]] = v
+
+            if not data and not exists:
+                # If no data provided and no record, create an empty shell with just email
+                cursor.execute("INSERT INTO patient (email) VALUES (%s)", (email,))
+                conn.commit()
+                return True
+
+            if exists:
+                if not data:
+                    return True  # nothing to update
+                # Dynamic UPDATE
+                set_clauses = []
+                values = []
+                for col, val in data.items():
+                    set_clauses.append(f"{col} = %s")
+                    values.append(val)
+                values.append(email)
+                cursor.execute(f"UPDATE patient SET {', '.join(set_clauses)} WHERE email = %s", values)
+            else:
+                # Prepare INSERT including email plus provided columns
+                columns = ['email'] + list(data.keys())
+                placeholders = ["%s"] * len(columns)
+                values = [email] + list(data.values())
+                cursor.execute(
+                    f"INSERT INTO patient ({', '.join(columns)}) VALUES ({', '.join(placeholders)})",
+                    values
+                )
+
+            conn.commit()
+            return True
+        except Exception as e:
+            print(f"Exception upserting patient profile: {e}")
+            return False
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
+    def getConnection(self):
+        conn = psycopg2.connect(DB_URL)
+        return conn
     
     def Login(self, user: Person): #boolean
         username= user.get_email()
@@ -289,35 +439,260 @@ class Schedule_System:
         #catch Exception e 
             #return None
             pass
-    
-    def Book(self, email, doctor, clinic, requestedDate, requestedTime, appointmentType, reason, specialRequests, smsReminder, emailReminder):
+    def Book(self, email, employeeId, date, time, roomId=None):
+        """Book a new appointment.
+        
+        Args:
+            email (str): Patient's email
+            employeeId (int): Doctor's employee ID
+            date (date): Appointment date
+            time (time): Appointment time
+            roomId (int, optional): Preferred room ID
+            
+        Returns:
+            tuple: (success: bool, message: str)
+        """
         try:
             conn = self.getConnection()
             cursor = conn.cursor()
+
             # Get patient id from email
-            cursor.execute("SELECT idnumber FROM patient WHERE email = %s", (email,))
+            cursor.execute("SELECT PatientID FROM Patient WHERE Email = %s", (email,))
             row = cursor.fetchone()
             if not row:
-                cursor.close()
-                conn.close()
                 return False, 'Patient not found'
             patient_id = row[0]
-            # Insert appointment
+
+            # Verify employee exists and is a doctor
+            cursor.execute("SELECT EmployeeID FROM Employee WHERE EmployeeID = %s AND Role = 'doctor'", (employeeId,))
+            if not cursor.fetchone():
+                return False, 'Invalid doctor ID'
+
+            # Check if timeslot is available
             cursor.execute("""
-                INSERT INTO appointment (patientid, doctor, clinic, requesteddate, requestedtime, type, reason, specialrequests, smsreminder, emailreminder, status)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'upcoming')
-            """, (patient_id, doctor, clinic, requestedDate, requestedTime, appointmentType, reason, specialRequests, smsReminder, emailReminder))
+                SELECT 1 FROM Appointments 
+                WHERE Date = %s AND Time = %s 
+                AND (EmployeeID = %s OR RoomID = %s)
+                AND Status != 'cancelled'
+            """, (date, time, employeeId, roomId))
+            
+            if cursor.fetchone():
+                return False, 'Time slot not available'
+
+            # Insert appointment according to schema
+            cursor.execute("""
+                INSERT INTO Appointments (
+                    PatientID, 
+                    Date, 
+                    Time, 
+                    Status, 
+                    EmployeeID,
+                    RoomID
+                ) VALUES (%s, %s, %s, 'pending', %s, %s)
+            """, (patient_id, date, time, employeeId, roomId))
+
             conn.commit()
-            cursor.close()
-            conn.close()
             return True, 'Appointment booked successfully'
+
         except Exception as e:
-            cursor.close()
-            conn.close()
+            print(f"Exception booking appointment: {e}")
             return False, str(e)
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
 
+    def get_doctors(self):
+        """Get list of available doctors with display-ready names.
 
+        Attempts to intelligently determine first/last name columns. Falls back to a single
+        Name column if that's all that exists. If the stored name value equals the role
+        (e.g. 'doctor'), it will try alternative columns before returning.
 
+        Returns:
+            list[dict]: [{ 'employeeId': int, 'name': 'Dr Govender' }]
+        """
+        try:
+            conn = self.getConnection()
+            cursor = conn.cursor()
+
+            # Discover available columns in employee table
+            cursor.execute("""
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_name = 'employee'
+            """)
+            cols = {r[0].lower() for r in cursor.fetchall()}
+
+            # Candidate columns
+            first_candidates = ['firstname', 'first_name', 'fname']
+            last_candidates  = ['lastname', 'last_name', 'lname', 'surname']
+
+            first_col = next((c for c in first_candidates if c in cols), None)
+            last_col  = next((c for c in last_candidates if c in cols), None)
+
+            name_col = 'name' if 'name' in cols else None
+            # Determine ID column
+            id_candidates = ['employeeid', 'employee_id', 'emp_id', 'id']
+            id_col = next((c for c in id_candidates if c in cols), 'employeeid')
+
+            # Optional role filter if column exists
+            role_col = 'role' if 'role' in cols else ('occupation' if 'occupation' in cols else None)
+            where_clause = f" WHERE lower({role_col}) = 'doctor'" if role_col else ''
+
+            # Detect specialization/department-like column
+            specialization_col = None
+            for cand in ['specialization', 'speciality', 'specialty', 'department', 'dept']:
+                if cand in cols:
+                    specialization_col = cand
+                    break
+
+            def make_display(role_val, first, last, raw_name, email, emp_id):
+                prefix_map = {
+                    'doctor': 'Dr',
+                    'nurse': 'Nurse',
+                    'staff': '',
+                    'admin': ''
+                }
+                role_l = (role_val or '').strip().lower()
+                prefix = prefix_map.get(role_l, 'Dr' if role_l == '' else '')
+
+                # Prefer surname/last name for display like: Dr Govender
+                last_clean = (last or '').strip() if last is not None else ''
+                first_clean = (first or '').strip() if first is not None else ''
+                raw_clean = (raw_name or '').strip()
+
+                # If we don't have last name but have raw name, try to take last token as surname
+                if not last_clean and raw_clean:
+                    parts = [p for p in raw_clean.split() if p]
+                    if len(parts) > 1:
+                        last_clean = parts[-1]
+                    else:
+                        last_clean = raw_clean
+
+                # Build display using prefix + surname
+                if prefix:
+                    if last_clean:
+                        return f"{prefix} {last_clean}"
+                    if raw_clean:
+                        return f"{prefix} {raw_clean}"
+                # Fallbacks if no prefix or surname
+                if raw_clean:
+                    return raw_clean
+                if first_clean:
+                    return first_clean
+                if email:
+                    return email
+                return f"Doctor #{emp_id}"
+
+            doctors = []
+            if first_col and last_col:
+                # Build query using detected first/last columns
+                select_role = f", {role_col}" if role_col else ''
+                select_spec = f", {specialization_col}" if specialization_col else ''
+                query = f"SELECT {id_col}, {first_col}, {last_col}{select_role}{select_spec} FROM employee{where_clause} ORDER BY {first_col}, {last_col}"  # no user input
+                cursor.execute(query)
+                for row in cursor.fetchall():
+                    # Unpack depending on selected columns
+                    idx = 0
+                    emp_id = row[idx]; idx += 1
+                    first = row[idx]; idx += 1
+                    last = row[idx]; idx += 1
+                    role_val = row[idx] if role_col else 'doctor'; idx += (1 if role_col else 0)
+                    spec_val = row[idx] if specialization_col else None
+                    display = make_display(role_val, first, last, None, None, emp_id)
+                    doctors.append({'employeeId': emp_id, 'name': display, 'specialization': (spec_val or '').strip() if spec_val else None})
+            elif name_col:
+                # Single name column available
+                select_role = f", {role_col}" if role_col else ''
+                select_spec = f", {specialization_col}" if specialization_col else ''
+                cursor.execute(f"SELECT {id_col}, {name_col}{select_role}{select_spec} FROM employee{where_clause} ORDER BY {name_col}")
+                for row in cursor.fetchall():
+                    idx = 0
+                    emp_id = row[idx]; idx += 1
+                    raw_name = row[idx]; idx += 1
+                    role_val = row[idx] if role_col else 'doctor'; idx += (1 if role_col else 0)
+                    spec_val = row[idx] if specialization_col else None
+                    display = make_display(role_val, None, None, raw_name, None, emp_id)
+                    doctors.append({'employeeId': emp_id, 'name': display, 'specialization': (spec_val or '').strip() if spec_val else None})
+            else:
+                # Fallback: attempt to use email column, otherwise role
+                email_col = 'email' if 'email' in cols else None
+                if email_col:
+                    select_role = f", {role_col}" if role_col else ''
+                    select_spec = f", {specialization_col}" if specialization_col else ''
+                    cursor.execute(f"SELECT {id_col}, {email_col}{select_role}{select_spec} FROM employee{where_clause} ORDER BY {email_col}")
+                    for row in cursor.fetchall():
+                        idx = 0
+                        emp_id = row[idx]; idx += 1
+                        email = row[idx]; idx += 1
+                        role_val = row[idx] if role_col else 'doctor'; idx += (1 if role_col else 0)
+                        spec_val = row[idx] if specialization_col else None
+                        display = make_display(role_val, None, None, None, email, emp_id)
+                        doctors.append({'employeeId': emp_id, 'name': display, 'specialization': (spec_val or '').strip() if spec_val else None})
+                else:
+                    # Last resort: just list IDs
+                    cursor.execute(f"SELECT {id_col} FROM employee{where_clause} ORDER BY {id_col}")
+                    for row in cursor.fetchall():
+                        doctors.append({'employeeId': row[0], 'name': f"Doctor #{row[0]}", 'specialization': None})
+
+            return doctors
+        except Exception as e:
+            print(f"Error fetching doctors: {e}")
+            return []
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
+
+    def get_available_times(self, doctor_id, date):
+        """Get available time slots for a given doctor and date.
+        
+        Args:
+            doctor_id (int): Doctor's employee ID
+            date (date): Date to check
+            
+        Returns:
+            list: Available time slots in HH:MM format
+        """
+        try:
+            conn = self.getConnection()
+            cursor = conn.cursor()
+            
+            # Get all booked times for the doctor on the given date
+            cursor.execute("""
+                SELECT Time::text 
+                FROM Appointments 
+                WHERE EmployeeID = %s 
+                AND Date = %s
+                AND Status != 'cancelled'
+            """, (doctor_id, date))
+            
+            booked_times = {row[0] for row in cursor.fetchall()}
+            
+            # Generate all possible time slots (8 AM to 5 PM, 30-min intervals)
+            all_slots = []
+            start = datetime.strptime('08:00', '%H:%M').time()
+            end = datetime.strptime('17:00', '%H:%M').time()
+            slot = start
+            
+            while slot <= end:
+                slot_str = slot.strftime('%H:%M')
+                if slot_str not in booked_times:
+                    all_slots.append(slot_str)
+                slot = (datetime.combine(date, slot) + timedelta(minutes=30)).time()
+            
+            return all_slots
+        except Exception as e:
+            print(f"Error fetching available times: {e}")
+            return []
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
     def Fetch_bookings (self,date: str): #Appointment [] 
         #execute sql query to fetch appointments from appointment table ysing date
         #return an empty appointment list if no books exist
@@ -364,7 +739,32 @@ class Schedule_System:
     
     
     def getEmpIdByEmail(self, email: str):
-        
+        try:
+            # Get a database connection
+            schedule_system_instance = Schedule_System()
+            conn = schedule_system_instance.getConnection()
+            cursor = conn.cursor()
+
+            # Execute SQL query safely using parameterized query
+            cursor.execute("SELECT EmployeeID FROM employee WHERE Email = %s", (email,))
+            result = cursor.fetchone()
+
+            # Extract the employee ID if found
+            employee_id = result[0] if result else None
+
+            return employee_id
+
+        except Exception as e:
+            print(f"Error getting employee ID by email: {e}")
+            return None
+
+        finally:
+            # Ensure resources are properly closed
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
     
 
     def Fetch_bookings_today(self): #Appointment []
@@ -570,6 +970,58 @@ class Schedule_System:
             cursor.close()
             conn.close()
             return False 
+        cursor = self.getConnection()
+        # Execute SQL query to fetch employee details by ID
+        cursor.execute("SELECT * FROM EMPLOYEE WHERE EMP_ID = emp_id")
+        # Fetch the result
+        info = cursor.fetchone()
+        # Use the retrieved data to create an Employee object
+        employee = Employee(info)
+        # Return the Employee object
+        return employee
+    def Change_patient_Status (self,appointmentID: str, status: str): #boolean
+        #if status == "cancelled":
+            #try
+                #cursor= get cpnnection to DB
+                #cursor.execute("""Update appointment status in the appointment table using appointmentID to cancelled""")
+                #cursor.execute("""Update appointment patient_id in the appointment table using appointmentID to null""")
+                #cursor.execute("""Update appointment employment_id in the appointment table using appointmentID to null""")
+                #close connections
+                #Return True 
+
+            #catch exception e:
+                #Return False "
+            #finally:
+                #close connections
+                #if status == "cancelled":
+        #elif status == "completed":
+            #try
+                #cursor= get cpnnection to DB
+                #cursor.execute("""Update appointment status in the appointment table using appointmentID to completed""")
+                #close connections
+                #Return True 
+
+            #catch exception e:
+                #Return False "
+            #finally:
+                #close connections
+        pass
+    def ChangeEmpForSchedule(self,AppointmentId: int): #boolean
+        """Update appointment doctor/nurse assigned in the database using appointmentID with sql to null
+            Return True if update succeeds, False otherwise"""
+        pass
+    def Notify_Patients (self, p:Patient): #boolean
+        # calls EmailNotification (p.email: str)
+        # calls SMSNotification (p.number: str)
+        # returns true if any calls return true
+        pass
+    def ConfirmBooking(self, AppointmentId: int, EmployeeId:int):#boolean 
+        """
+        1. calls addEmptToAppointment(id) first if assigning employee here.
+        2. Calls Notify_Patients(patient) to send SMS/email notifications.
+        3. Updates appointment status to 'Scheduled' in the database.
+        4. Returns True if all steps succeed, False otherwise.
+        """
         pass
     
     def Notify_Patients (self, p:Patient)->bool: 
