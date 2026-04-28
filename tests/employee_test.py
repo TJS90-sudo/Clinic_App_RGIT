@@ -1,5 +1,5 @@
 # tests/test_employee.py
-from models import Employee
+from app.models.models import Employee
 
 def test_employee_creation():
     # Arrange: populate employee with test data

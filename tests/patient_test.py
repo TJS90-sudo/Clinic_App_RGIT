@@ -1,5 +1,5 @@
 # tests/test_patient.py
-from models import Patient
+from app.models.models import Patient
 
 def test_patient_creation():
     # Arrange: populate patient with test data

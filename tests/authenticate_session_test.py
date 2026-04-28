@@ -1,4 +1,4 @@
-from models import Schedule_System
+from app.models.models import Schedule_System
 
 def test_authenticate_session():
     system = Schedule_System()

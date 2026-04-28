@@ -1,5 +1,5 @@
 from datetime import date, time
-from models import Appointment, Employee
+from app.models.models import Appointment, Employee
 
 def test_appointment_creation():
     # Arrange

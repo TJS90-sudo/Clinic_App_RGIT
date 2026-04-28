@@ -1,4 +1,4 @@
-from models import Person
+from app.models.models import Person
 
 def test_person_creation():
     # Arrange

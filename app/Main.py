@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify, session, abort,redirect, render_template_string, url_for,render_template
 from flask_limiter import Limiter
+from app.services.auth_service import AuthService,LoginService, PasswordService
 import hashlib
-from  models import Person, Employee, Appointment,Patient, Schedule_System
+from  app.models.models import Person, Employee, Appointment,Patient, Schedule_System
 import pyotp
 from datetime import timedelta
 import qrcode,base64,io
@@ -69,10 +70,7 @@ def api_reschedule_appointment(appointment_id):
     Schedule_System_instance = Schedule_System()
     ok = Schedule_System_instance.reschedule_appointment(appointment_id, email, new_date, new_time)
     return jsonify({'success': ok})
-# ---------------- HOME ---------------- #
-@app.route('/', methods=['GET'])
-def home():
-    return render_template('index.html')
+
 
 
 # ---------------- AUTH & USER ---------------- #
@@ -80,73 +78,63 @@ def home():
 @limiter.limit("3 per 5 minutes", key_func=lambda: request.form.get('email'))
 def login():
 
-    print("LOGIN ROUTE CALLED")
-    print("Session at /auth/login:", dict(session))
     # 1. Get form data (from frontend)
     username = request.form.get('email')
     password = request.form.get('password')
     role = request.form.get('role')
-    print ("Role selected:", role)
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    print(f"Login attempt: username={username}, password(raw)={password}, password(hash)={hashed_password}, role={role}")
 
-    # 2. Create Person object (pseudo)
-    person = Person(username, hashed_password)
-    Schedule_System_instance = Schedule_System()
-    # 3. Validate credentials
-    login_success = Schedule_System_instance.Login(person)
+    hashed_password = PasswordService.hash(password)
 
-    print(f"Login DB check result: {login_success}")
-
-    # Helper: detect AJAX/fetch
-    def is_ajax():
-        return request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes['application/json'] > 0
+    login_success = LoginService(username, hashed_password).login()
 
     if not login_success:
-        if is_ajax():
-            return jsonify({"success": False, "message": "Invalid username or password"}), 401
-        else:
-            return "Invalid username or password"
+        return jsonify({
+            "success": False,
+            "message": "Invalid username or password"
+        }), 401
 
-    emp_roles=["nurse", "doctor", "admin", "receptionist"]
+    auth = AuthService()
+    db_role = auth.get_role(username)
 
-    if role in emp_roles:
+    if not db_role:
+        return jsonify({"success": False, "message": "User not found"}), 404
+
+    if role and role != db_role:
+        return jsonify({
+            "success": False,
+            "message": "Role mismatch"
+        }), 403
+
+    p = Person(username, db_role)
+    user_role = db_role
+    user_username = p.get_username()
+
+    if AuthService.is_valid_employee_role(user_role):
+
         if session.get('authenticated'):
-            redirect_url = None
-            session["email"] = username
-            if role=="nurse":
-                redirect_url = "/nurse/home"
-            elif role=="doctor":
-                redirect_url = "/doctor/home"
-            elif role=="admin":
-                redirect_url = "/admin/home"
-            elif role=="receptionist":
-                redirect_url = "/receptionist/home"
-            if is_ajax():
-                return jsonify({"success": True, "redirect": redirect_url})
-            else:
-                return redirect(redirect_url)
+            return redirect(AuthService.get_route(user_role))
 
         session.permanent = True
-        session['temp_user'] = username
-        session['role'] = role
+        session['temp_user'] = user_username
+        session['role'] = user_role
+
         if 'otp_secret' not in session:
             session['otp_secret'] = pyotp.random_base32()
-        print("Host, login route:", request.host)
-        print("Session keys, login route:", session.keys())
-        if is_ajax():
-            return jsonify({"success": True, "redirect": url_for('setup_2fa')})
-        else:
-            return redirect(url_for('setup_2fa'))
+
+        return jsonify({
+            "success": True,
+            "redirect": url_for('setup_2fa')
+        })
 
     else:
-        session.permanent = True    
+        session.permanent = True
         session['authenticated'] = True
-        session['username'] = username
-        if is_ajax():
-            return jsonify({"success": True, "redirect": "/patient/home"})
-        else:
-            return redirect("/patient/home")
+        session['username'] = user_username
+
+        return jsonify({
+            "success": True,
+            "redirect": "/patient/home"
+        })
     
 @app.route('/patient/home', methods=['GET'])
 def patient_homepage():
@@ -171,7 +159,7 @@ def patient_homepage():
                 <li><b>Address:</b> {patient_data.get_address() or ''}</li>
                 <li><b>Date of Birth:</b> {patient_data.get_date_of_birth() or ''}</li>
                 <li><b>ID Number:</b> {patient_data.get_id_number() or ''}</li>
-                <li><b>Gender:</b> {patient_data.get_id_number() or ''}</li>
+                <li><b>Gender:</b> {patient_data.get_gender() or ''}</li>
             </ul>
         </div>
         """)
@@ -384,58 +372,12 @@ def update_queue():
 
 
 
-# ---------------- DOCTOR ---------------- #
-@app.route('/doctor/home', methods=['GET'])
-def doctor_homepage():
-    # pseudo
-    if not session.get('authenticated'):
-        return redirect(url_for('login'))
-    Schedule_System_instance= Schedule_System()
-    emp_id= Schedule_System_instance.getEmpIdByEmail(session["email"])
-    if Schedule_System_instance.AuthenticateSession(session["email"], "doctor"):
-        assigned_patients = Schedule_System_instance.getAssignedPatients(emp_id)
-        return render_template("doctors-dashboard.html", appointments=assigned_patients)
-    else:
-        abort(403)
-
-
-
-
-
-
-
-# ---------------- NURSE ---------------- #
-@app.route('/nurse/home', methods=['GET'])
-def nurse_homepage():
-    if not session.get('authenticated'):
-       return redirect(url_for('login'))
-    Schedule_System_instance= Schedule_System()
-
-    if Schedule_System_instance.AuthenticateSession(session["email"], "nurse"):
-        emp_id= Schedule_System_instance.getEmpIdByEmail(session["email"])
-        upcoming_appointments = Schedule_System_instance.getAssignedPatients(emp_id)
-
-        return render_template("nurse-dashboard.html",
-                                appointments=upcoming_appointments)
-    else:   
-        abort(403)
-
 
 
 
 
 
 # ---------------- STAFF---------------- #
-@app.route('/receptionist/home', methods=['GET'])
-def receptionist_homepage():
-    if not session.get('authenticated'):
-        return redirect(url_for('login'))
-    Schedule_System_instance= Schedule_System()
-    if Schedule_System_instance.AuthenticateSession(session["email"], "staff"):
-        today_appointments = Schedule_System_instance.Fetch_bookings_today()
-
-        return render_template("receptionist-dashboard.html",
-                                appointments=today_appointments)
 
 @app.route('/appointments/status', methods=['PUT'])#
 def change_patient_status():
@@ -623,14 +565,7 @@ def confirm_booking():
 
 
 # ---------------- ADMIN ---------------- #
-@app.route('/admin/home', methods=['GET'])
-def admin_homepage():
-    # pseudo
-    #if not session.get('authenticated'):
-    #    return redirect(url_for('login'))
-    #if AuthenticateSession (session["email"], "admin")
-        # return render_template("admin_home.html")
-    pass
+
 @app.route('/reports/appointments', methods=['GET'])
 def appointment_stats():
     # pseudo
@@ -722,6 +657,75 @@ def schedule_system_route():
             #     render_template(webpage, {message=UNsuccessFUL})
         pass"""
     pass
+
+
+
+#-------------------------------------PAGE ROUTES-------------------------------#
+
+# ---------------- INDEX PAGE ---------------- #
+@app.route('/', methods=['GET'])
+def home():
+    return render_template('index.html')
+
+# ---------------- RECEPTIONIST HOME PAGE ---------------- #
+@app.route('/receptionist/home', methods=['GET'])
+def receptionist_homepage():
+    if not session.get('authenticated'):
+        return redirect(url_for('login'))
+    Schedule_System_instance= Schedule_System()
+    if Schedule_System_instance.AuthenticateSession(session["email"], "staff"):
+        today_appointments = Schedule_System_instance.Fetch_bookings_today()
+
+        return render_template("receptionist-dashboard.html",
+                                appointments=today_appointments)
+    else:
+        abort(403)
+
+# ---------------- GENERATE STAFF HOME PAGE ---------------- #
+@app.route('/admin/home', methods=['GET'])
+def admin_homepage():
+    # pseudo
+    #if not session.get('authenticated'):
+    #    return redirect(url_for('login'))
+    #if AuthenticateSession (session["email"], "admin")
+        # return render_template("admin_home.html")
+    pass
+
+
+# ---------------- DOCTOR HOME PAGE ---------------- #
+@app.route('/doctor/home', methods=['GET'])
+def doctor_homepage():
+    # pseudo
+    if not session.get('authenticated'):
+        return redirect(url_for('login'))
+    Schedule_System_instance= Schedule_System()
+    emp_id= Schedule_System_instance.getEmpIdByEmail(session["email"])
+    if Schedule_System_instance.AuthenticateSession(session["email"], "doctor"):
+        assigned_patients = Schedule_System_instance.getAssignedPatients(emp_id)
+        return render_template("doctors-dashboard.html", appointments=assigned_patients)
+    else:
+        abort(403)
+
+
+# ---------------- NURSE HOME PAGE ---------------- #
+@app.route('/nurse/home', methods=['GET'])
+def nurse_homepage():
+    if not session.get('authenticated'):
+       return redirect(url_for('login'))
+    Schedule_System_instance= Schedule_System()
+
+    if Schedule_System_instance.AuthenticateSession(session["email"], "nurse"):
+        emp_id= Schedule_System_instance.getEmpIdByEmail(session["email"])
+        upcoming_appointments = Schedule_System_instance.getAssignedPatients(emp_id)
+
+        return render_template("nurse-dashboard.html",
+                                appointments=upcoming_appointments)
+    else:   
+        abort(403)
+
+
+
+
 
 
 

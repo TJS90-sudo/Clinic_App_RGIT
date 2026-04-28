@@ -5,6 +5,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 import psycopg2.extras
 from dataclasses import dataclass, field, asdict
+from typing import Optional
 from datetime import datetime, date, time, timedelta
 import hashlib
 import uuid
@@ -25,13 +26,17 @@ Send_Grid_key= os.getenv("Send_Grid_key")
 class Person:
     email: str
     password_hash: str
+    role :Optional[str] = None
 
-    def get_email(self):
+    def get_username(self):
         return self.email
 
     def get_password(self):
         # Example of a normal function in a dataclass
         return self.password_hash
+
+    def get_role(self):
+        return self.role
     
 # -------------------- PATIENT --------------------
 @dataclass
@@ -714,7 +719,7 @@ class Schedule_System:
         """
         pass
         
-    def AuthenticateSession(self, email: str, role: str) -> bool:
+    def get_role(self, email: str)  -> str | None:
         try:
             connection = self.getConnection()
             cursor = connection.cursor()
@@ -723,20 +728,19 @@ class Schedule_System:
             cursor.execute("SELECT role FROM employee WHERE email = %s", (email,))
             info = cursor.fetchone()
 
-            if info and info[0] == role:
-                cursor.close()
-                connection.close()
-                return True
-            else:
-                cursor.close()
-                connection.close()
-                return False
+            info = cursor.fetchone()
 
-        except Exception as e:
-            cursor.close()
-            connection.close()
-            return False
-    
+            return info[0] if info else None
+
+        except Exception:
+            return None
+
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+        
     
     def getEmpIdByEmail(self, email: str):
         try:
