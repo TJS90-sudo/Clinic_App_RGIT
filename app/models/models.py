@@ -1,6 +1,7 @@
 import hashlib
 import base64
 import psycopg2
+import supabase
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 import psycopg2.extras
@@ -360,51 +361,54 @@ class Schedule_System:
         conn = psycopg2.connect(DB_URL)
         return conn
     
-    def Login(self, user: Person): #boolean
+    def Login(self, user: Person)-> dict | None:
         username= user.get_email()
         password = user.get_password()
         try:
-            conn = self.getConnection()
-            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
-            # Example SQL query (use parameters to prevent SQL injection)
-            query = "SELECT * FROM auth WHERE email = %s AND PasswordHash = %s"
-            cursor.execute(query, (username, password))
-            row = cursor.fetchone()
-
-            cursor.close()
-            conn.close()
-
-            if row:
-                return True
+            response = supabase.auth.sign_in_with_password(
+                {
+                    "email": username,
+                    "password":password,
+                }
+            )
+            if response.user and response.session:
+                return response
             else:
-                return False
+                return None
         except Exception as e:
-            if cursor is not None:
-                cursor.close()
-            if conn is not None:
-                conn.close()
-            return False
+            print(f"Exception during login: {e}")
+            return None
+
 
 
     def Register(self,email: str, password: str): #boolean
+
+        conn = None
+        cursor = None
         try:
+            response = supabase.auth.sign_up(
+                {
+                    "email": email,
+                    "password": password,
+                }
+            )
+            if not response.user:
+                return False 
+              
             conn = self.getConnection()
-            password_hash = password
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO auth (email,role, passwordhash) VALUES (%s,%s, %s)", (email,"patient", password_hash))
+            cursor.execute("INSERT INTO role_registry (user_id,role) VALUES (%s,%s)", (response.user.id,"patient")) 
+            cursor.execute("INSERT INTO patient (user_id,email) VALUES (%s,%s)", (response.user.id,email))
             conn.commit()
-            cursor.close()
-            conn.close()
-            # Password is hashed before storing in the database
             return True
         except Exception as e:
             print(f"Exception during registration: {e}")
+            return False
+        finally:
             if cursor is not None:
                 cursor.close()
             if conn is not None:
                 conn.close()
-            return False
 
     
     def changeProfileDetail (self,p:Patient): #boolean
@@ -719,28 +723,35 @@ class Schedule_System:
         """
         pass
         
-    def get_role(self, email: str)  -> str | None:
-        try:
-            connection = self.getConnection()
-            cursor = connection.cursor()
+    def get_role(self, access_token: str)  -> str | None:
+        user = supabase.auth.get_user(access_token)
 
-            # Fetch role for the given email
-            cursor.execute("SELECT role FROM employee WHERE email = %s", (email,))
-            info = cursor.fetchone()
-
-            info = cursor.fetchone()
-
-            return info[0] if info else None
-
-        except Exception:
+        if not user or not user.user:
             return None
 
+        user_id = user.user.id
+        try:
+            conn = self.getConnection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT role FROM role_registry WHERE user_id = %s", (user_id,))
+            row = cursor.fetchone()
+            return row[0] if row else None
+        except Exception as e:
+            print(f"Error fetching user role: {e}")
+            return None
         finally:
-            if cursor:
+            if cursor is not None:
                 cursor.close()
-            if connection:
-                connection.close()
+            if conn is not None:
+                conn.close()
         
+    def validate_session(self, token)-> bool:
+        try:
+            session = supabase.auth.get_session(token)
+            return session is not None and session.session is not None
+        except Exception as e:
+            print(f"Error validating session: {e}")
+            return False  
     
     def getEmpIdByEmail(self, email: str):
         try:

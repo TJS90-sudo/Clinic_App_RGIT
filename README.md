@@ -1,33 +1,29 @@
 Databse Info:
 
         # --------------------------------------------
-        # Create Auth table
+        # Create  role_registry table
         # --------------------------------------------
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS Auth (
-                Email VARCHAR(100) PRIMARY KEY,
-                Role VARCHAR(20) NOT NULL CHECK (Role IN ('Admin', 'staff', 'patient', 'doctor', 'nurse')),
-                PasswordHash VARCHAR(255) NOT NULL
-            );
-            """)
-        
-
+        CREATE TABLE role_registry (
+            user_id UUID PRIMARY KEY REFERENCES auth.users(id),
+            role VARCHAR(20) NOT NULL CHECK (
+                role IN ('Admin', 'staff', 'patient', 'doctor', 'nurse')
+            )
+        );
 
         # --------------------------------------------
         # Create Patient table
         # --------------------------------------------
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS Patient (
-                PatientID SERIAL PRIMARY KEY,
-                Email VARCHAR(100) NOT NULL REFERENCES Auth(Email) ON DELETE CASCADE,
-                ContactNumber VARCHAR(15) NOT NULL CHECK (ContactNumber ~ '^[0-9]{11}$'),
-                Address VARCHAR(255),
-                DateOfBirth DATE NOT NULL,
-                IDnumber VARCHAR(13) UNIQUE NOT NULL CHECK (IDnumber ~ '^[0-9]{13}$'),
-                Gender VARCHAR(10) NOT NULL CHECK (Gender IN ('Male', 'Female'))
-                name Text NOT NULL
-            );
-            """)
+            CREATE TABLE Patient (
+                    user_id UUID PRIMARY KEY,
+                    email TEXT NOT NULL,
+                    contact_number VARCHAR(15) CHECK (contact_number ~ '^[0-9]{11}$'),
+                    address VARCHAR(255),
+                    date_of_birth DATE,
+                    id_number VARCHAR(13) UNIQUE CHECK (id_number ~ '^[0-9]{13}$'),
+                    gender VARCHAR(10) CHECK (gender IN ('Male', 'Female')),
+                    name TEXT
+                );""")
 
         # --------------------------------------------
         # Create Employee table
