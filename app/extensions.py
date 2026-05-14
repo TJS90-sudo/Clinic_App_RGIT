@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, session, abort,redirect, render_template_string, url_for,render_template
-from app.services.auth_service import AuthService,LoginService, PasswordService
+from app.services.authorization.auth_service import AuthService,LoginService, PasswordService
 from  app.models.models import Person, Employee, Appointment,Patient, Schedule_System
 import pyotp
 from datetime import timedelta
@@ -16,27 +16,32 @@ from flask_limiter.util import get_remote_address
 from flask_session import Session
 from flask_cors import CORS
 from werkzeug.local import LocalProxy
-from flask import g, current_app
+from flask import g
 from supabase import create_client
-from flask_storage import FlaskSessionStorage
 import os
+from redis import Redis
+
 load_dotenv()
 
 limiter = Limiter(key_func=get_remote_address)
 sess = Session()
 cors = CORS()
-url = os.environ.get("SUPABASE_URL", "")
-key = os.environ.get("SUPABASE_KEY", "")
+
+
+redis_client = Redis(SS
+    host = os.environ["REDIS_HOST"],
+    port = int(os.environ["REDIS_PORT"]),
+    decode_responses = True
+)
 
 
 def get_supabase():
 
     if "supabase" not in g:
-
-        g.supabase = create_client(
-            current_app.config["SUPABASE_URL"],
-            current_app.config["SUPABASE_KEY"]
-        )
+        
+        url = os.environ.get("SUPABASE_URL", "")
+        key = os.environ.get("SUPABASE_KEY", "")
+        g.supabase = create_client(url,key)
 
     return g.supabase
 

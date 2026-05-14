@@ -12,6 +12,7 @@ import hashlib
 import uuid
 import os
 from dotenv import load_dotenv
+import  app.services.authorization.supabase_service as supabase_service
 from twilio.rest import Client
 load_dotenv()
 DB_URL= os.getenv("DB_URL")
@@ -365,12 +366,7 @@ class Schedule_System:
         username= user.get_email()
         password = user.get_password()
         try:
-            response = supabase.auth.sign_in_with_password(
-                {
-                    "email": username,
-                    "password":password,
-                }
-            )
+            response = supabase.login(us)
             if response.user and response.session:
                 return response
             else:
@@ -385,13 +381,9 @@ class Schedule_System:
 
         conn = None
         cursor = None
+        
         try:
-            response = supabase.auth.sign_up(
-                {
-                    "email": email,
-                    "password": password,
-                }
-            )
+            response = supabase().sign_up(email, password)
             if not response.user:
                 return False 
               
@@ -724,7 +716,7 @@ class Schedule_System:
         pass
         
     def get_role(self, access_token: str)  -> str | None:
-        user = supabase.auth.get_user(access_token)
+        user = supabase_service().auth.get_user(access_token)
 
         if not user or not user.user:
             return None
@@ -747,11 +739,12 @@ class Schedule_System:
         
     def validate_session(self, token)-> bool:
         try:
-            session = supabase.auth.get_session(token)
-            return session is not None and session.session is not None
+            user_response = supabase.auth.get_user(token)
+            return user_response.user is not None
+
         except Exception as e:
             print(f"Error validating session: {e}")
-            return False  
+            return False
     
     def getEmpIdByEmail(self, email: str):
         try:

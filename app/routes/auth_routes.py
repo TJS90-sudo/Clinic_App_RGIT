@@ -1,64 +1,29 @@
 
-from flask import Flask, request, jsonify, session, abort,redirect, render_template_string, url_for,render_template, Blueprint
+from attrs import validate
+from flask import Flask, make_response, request, jsonify, session, abort,redirect, render_template_string, url_for,render_template, Blueprint
 from flask_limiter import Limiter
+from app.services.authorization.supabase_service import supabase
+from  app.services.authorization.validators import isValidEmail, is_valid_employee_role, get_route
 from  app.models.models import Person, Employee, Appointment,Patient, Schedule_System
-from app.services import auth_service
-from app.services.auth_service import AuthService,LoginService, PasswordService
-
+from app.services.authorization.redis_service import redis_service
+from app.services.authorization.auth_service import AuthService
+from app.services.authorization.validators import isValidEmail, is_valid_employee_role, get_route
 auth = Blueprint("auth", __name__)
 
 
 # ---------------- AUTH & USER ---------------- #
 @auth.route('/auth/login', methods=['POST'])
 @Limiter.limit("3 per 5 minutes", key_func=lambda: request.form.get('email'))
-def login():
+def login():  
 
     # 1. Get form data (from frontend)
     username = request.form.get('email')
     password = request.form.get('password')
     role = request.form.get('role')
-    auth_header = request.headers.get("Authorization")
+    
+    supabase_service = supabase()
 
-    if auth_header:
-        token = auth_header.replace("Bearer ", "")
-        if AuthService().session_valid(token):
-            if AuthService.is_valid_employee_role(role) and AuthService.is_2fa_complete(token):
-                        user_role = AuthService().get_role(token)
-                        if user_role and user_role == role:
-                            return redirect(AuthService.get_route(user_role))
-                        else:
-                            return jsonify({
-                                "success": False,
-                                "message": "Role mismatch"
-                            }), 403
-            elif role  == "patient":
-                        user_role = AuthService().get_role(token)
-                        if user_role and user_role == "patient":
-                            return redirect("/patient/home")
-                        else:
-                            return jsonify({
-                                "success": False,
-                                "message": "Role mismatch"
-                            }), 403
-            else:
-                return jsonify({
-                    "success": False,
-                    "message": "Invalid role"
-                }), 400
-        
-        if AuthService().employee_session_valid(token):
-            user_role = AuthService().get_role(token)
-            if user_role and user_role == role: 
-                return redirect(AuthService.get_route(user_role))
-            elif user_role  == "patient" and role == "patient":
-                return redirect("/patient/home")
-            else:
-                return jsonify({
-                    "success": False,
-                    "message": "Role mismatch"
-                }), 403
-            
-    auth_result  = LoginService(username,password).login()
+    auth_result  = supabase_service.login(username,password)
 
     if not auth_result:
         return jsonify({
@@ -66,8 +31,8 @@ def login():
             "message": "Invalid username or password"
         }), 401
 
-
-    db_role = AuthService().get_role(auth_result['access_token'])
+    auth_service = AuthService()
+    db_role = auth_service.get_role(auth_result['access_token'])
 
     if not db_role:
         return jsonify({"success": False, "message": "User not found"}), 404
@@ -78,122 +43,107 @@ def login():
             "message": "Role mismatch"
         }), 403
 
-    
-    user_role = db_role
-    token = auth_result['access_token']
-    if AuthService.is_valid_employee_role(user_role):
-        return jsonify({
-            "success": False,
-            "redirect": "setup_2fa"
-        })
+    if is_valid_employee_role(db_role):
+        auth_service.send_otp(username)
     else:    
-        return jsonify({
+        response = jsonify({
             "success": True,
             "redirect": "/patient/home"
         })
+
+        response.set_cookie(
+            "access_token",
+            auth_result['access_token'],
+            httponly=True,
+            secure=True,
+            samesite="Lax"
+        )
+
+        return response, 200
     
-@auth.route('/patient/home', methods=['GET'])
-def patient_homepage():
-    # Get logged-in user's email from session
-    email = session.get('username')
-    patient_data = None
-    if email:
-        Schedule_System_instance = Schedule_System()
-        patient_data = Schedule_System_instance.get_patient_by_email(email)
-    # Render template with patient data
-    html = open('frontend/pages/patient-dashboard.html').read()
-    # Simple string replace for demo; in production use Jinja2 templates
-    if patient_data:
-        html =  html.replace('User', patient_data.get_name())
-        html = html.replace('<!--PATIENT_INFO-->', f"""
-        <div class='patient-info-card'>
-            <h2>Patient Information</h2>
-            <ul>
-                <li><b>Name:</b> {patient_data.get_name() or ''}</li>
-                <li><b>Email:</b> {patient_data.get_email() or ''}</li>
-                <li><b>Contact Number:</b> {patient_data.get_number() or ''}</li>
-                <li><b>Address:</b> {patient_data.get_address() or ''}</li>
-                <li><b>Date of Birth:</b> {patient_data.get_date_of_birth() or ''}</li>
-                <li><b>ID Number:</b> {patient_data.get_id_number() or ''}</li>
-                <li><b>Gender:</b> {patient_data.get_gender() or ''}</li>
-            </ul>
-        </div>
-        """)
-    else:
-        html = html.replace('<!--PATIENT_INFO-->', '<div class="patient-info-card"><b>Patient data not found.</b></div>')
-    return render_template_string(html)
+@auth.route('/auth/resolve', methods=['GET'])
+def session_state():
+    #this route is called assumig that in the frontend we have a bearer token 
+    auth_header = request.headers.get("Authorization")
+    token = auth_header.replace("Bearer ", "")
+    supabase_service = supabase()
+    if supabase_service.validate_session(token):
+        auth_service = AuthService()
+        user_role = auth_service.get_role(token)
 
-@auth.route('/setup_2fa', methods=['GET', 'POST'])
+        if user_role == "patient":
+            return jsonify({
+                "success": True,
+                "redirect": "/patient/home"
+            }), 200
+        
+
+        if not auth_service.is_2fa_complete(token):
+            return supabase_service.send_otp(token)
+                
+        route = get_route(user_role)
+        return jsonify({
+            "success": True,
+            "redirect": route
+        }), 200
+    
+    return jsonify({
+        "success": False,
+        "message": "No valid session"
+    }), 401
+
+@auth.route('/auth/callback', methods=['GET' ])
 def setup_2fa():
-    print("Host:", request.host)
-    print("Session keys:", session.keys())
 
-    username = session.get('temp_user')
-    secret = session.get('otp_secret')
+    code = request.args.get("code")
 
-    # Ensure user came from login
-    if not username or not secret:
-        return redirect('/')
+    if not code:
+        return jsonify({"error": "Missing code"}), 400
+    
+    supabase_service = supabase()
 
-    Schedule_System_instance = Schedule_System()
-    if  session.get('role') =="receptionist":
-        session['role']="staff"
+    response = supabase_service.getSessionFromCode(code)
 
-    if not Schedule_System_instance.AuthenticateSession(username, session.get('role')):
-        return redirect('/')
+    session = response.session
 
-    totp = pyotp.TOTP(secret)
+    user = response.user
 
-    if request.method == 'POST':
-        code = request.form.get('code')
-        if totp.verify(code):
-            session['authenticated'] = True
-            session['username'] = username
-            session["email"]=session['username']
-            # clear temporary session data
-            session.pop('temp_user', None)
-            session.pop('otp_secret', None)
+    user_id = user.id
 
-            role = session.get('role')
+    access_token = session.access_token
+    role = AuthService().get_role(access_token)
+    
+    redis_client = redis_service()
+    result = redis_client.addSessionToCache(user_id)
 
-            if role == "staff":
-                return redirect('/receptionist/home')
-            elif role == "doctor":
-                return redirect('/doctor/home')
-            elif role == "nurse":
-                return redirect('/nurse/home')
-            elif role == "admin":
-                return redirect('/admin/home')
+    if result:
+        route=get_route(role)
+        response = make_response(
+            redirect(route)
+        )
+        response.set_cookie(
+            "access_token",
+            access_token,
+            httponly=True,
+            secure=True,
+            samesite="Lax"
+        )
 
-        else:
-            return "Invalid 2FA code"
+        return response
+    
+    return jsonify({"error": "Failed to add session to cache"}), 400
 
-    # GET request → show QR code + form
-    uri = totp.provisioning_uri(name=username, issuer_name="MyFlaskApp")
-    img = qrcode.make(uri)
-    buf = io.BytesIO()
-    img.save(buf, format='PNG')
-    img_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-
-    return render_template('setup_2fa.html', qr_code=img_base64, secret=secret)
-
-
-@auth.route('/auth/register', methods=['POST'])
+@auth.route('/auth/register', methods=['POST']) 
 def register():
-    # pseudo:
-    # 1. Get form data
+    #  Get form data
     try:
         email = request.form.get("email")
-        plain_password= request.form.get("password")
+        password= request.form.get("password")
 
-        val = AuthService.sign_up(email, plain_password)
-        # 4. If success: render "update details" page 
+        val = supabase().register(email,password) 
+
         if val:
-            # Automatically log in the user and redirect to patient dashboard
-            session.permanent = True
-            session['authenticated'] = True
-            session['username'] = email
-            return redirect(url_for('patient_homepage'))
+            return jsonify({"success": False, "redirect": url_for('patient_homepage')}), 500
         else:
             return jsonify({"success": False}), 400
     except Exception as e:
